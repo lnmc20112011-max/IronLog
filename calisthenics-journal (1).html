@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRON LOG — Nhật ký Calisthenics</title>
+<style>
+  :root{
+    --bg: #101014;
+    --bg-raised: #17171d;
+    --bg-card: #1c1c23;
+    --line: #2a2a33;
+    --line-soft: #232329;
+    --chalk: #ececef;
+    --chalk-dim: #9a9aa5;
+    --chalk-faint: #63636e;
+    --ember: #ff5d3a;
+    --ember-dim: #7a2c1c;
+    --iron: #4d7cff;
+    --good: #45c98a;
+
+    --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+    --font-body: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  }
+
+  @font-face{
+    font-family:'Oswald';
+    src:local('Oswald');
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,93,58,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(77,124,255,0.07), transparent 55%),
+      var(--bg);
+    color:var(--chalk);
+    font-family:var(--font-body);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+
+  ::selection{ background:var(--ember); color:#12100f; }
+
+  /* ---------- Layout shell ---------- */
+  .shell{
+    max-width:920px;
+    margin:0 auto;
+    padding:28px 20px 120px;
+  }
+
+  header.top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:26px;
+  }
+
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .brand .mark{
+    font-family:var(--font-display);
+    font-size:30px;
+    letter-spacing:0.5px;
+    font-weight:600;
+    line-height:1;
+  }
+  .brand .mark span{ color:var(--ember); }
+  .brand .sub{
+    color:var(--chalk-faint);
+    font-size:12.5px;
+    letter-spacing:0.3px;
+  }
+
+  nav.tabs{
+    display:flex;
+    gap:6px;
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:4px;
+  }
+  nav.tabs button{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--chalk-dim);
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  nav.tabs button:hover{ color:var(--chalk); }
+  nav.tabs button.active{
+    background:var(--ember);
+    color:#1a0e0a;
+  }
+
+  section.view{ display:none; }
+  section.view.active{ display:block; }
+
+  /* ---------- Buttons / inputs ---------- */
+  button{ font-family:var(--font-body); }
+
+  .btn{
+    appearance:none;
+    border:1px solid var(--line);
+    background:var(--bg-card);
+    color:var(--chalk);
+    padding:10px 16px;
+    border-radius:9px;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:border-color .15s ease, transform .1s ease, background .15s ease;
+  }
+  .btn:hover{ border-color:var(--chalk-faint); }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{
+    background:var(--ember);
+    border-color:var(--ember);
+    color:#1a0e0a;
+  }
+  .btn-primary:hover{ background:#ff7355; border-color:#ff7355; }
+  .btn-ghost{
+    background:transparent;
+    border-color:transparent;
+    color:var(--chalk-faint);
+    padding:8px 10px;
+  }
+  .btn-ghost:hover{ color:var(--ember); border-color:transparent; background:rgba(255,93,58,0.08); }
+  .btn-danger:hover{ color:#ff8a70; }
+  .btn-block{ width:100%; }
+  .btn-sm{ padding:7px 12px; font-size:12.5px; border-radius:7px; }
+
+  input, select, textarea{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--chalk);
+    padding:10px 12px;
+    border-radius:8px;
+    font-family:var(--font-body);
+    font-size:14px;
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  input::placeholder, textarea::placeholder{ color:var(--chalk-faint); }
+  input:focus, select:focus, textarea:focus{ border-color:var(--ember); }
+  label{
+    display:block;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--chalk-faint);
+    margin-bottom:6px;
+    font-weight:600;
+  }
+  .field{ margin-bottom:14px; }
+  .row{ display:flex; gap:10px; }
+  .row > .field{ flex:1; }
+
+  /* ---------- Empty state ---------- */
+  .empty{
+    border:1px dashed var(--line);
+    border-radius:14px;
+    padding:44px 24px;
+    text-align:center;
+    color:var(--chalk-faint);
+    font-size:14px;
+  }
+  .empty .big{
+    font-family:var(--font-display);
+    font-size:20px;
+    color:var(--chalk-dim);
+    margin-bottom:6px;
+    letter-spacing:0.3px;
+  }
+
+  /* ---------- Journal: day cards ---------- */
+  .day-card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .day-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 18px;
+    cursor:pointer;
+    gap:12px;
+  }
+  .day-head:hover{ background:rgba(255,255,255,0.015); }
+  .day-date-block{ display:flex; align-items:baseline; gap:12px; min-width:0; }
+  .day-date{
+    font-family:var(--font-display);
+    font-size:19px;
+    letter-spacing:0.3px;
+    white-space:nowrap;
+  }
+  .day-title{
+    color:var(--chalk-dim);
+    font-size:13.5px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .day-meta{ display:flex; align-items:center; gap:14px; flex-shrink:0; }
+  .day-count{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--chalk-faint);
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    padding:3px 9px;
+    border-radius:20px;
+  }
+  .chevron{
+    color:var(--chalk-faint);
+    transition:transform .18s ease;
+    font-size:12px;
+  }
+  .day-card.open .chevron{ transform:rotate(90deg); color:var(--ember); }
+
+  .day-body{
+    display:none;
+    padding:0 18px 18px;
+    border-top:1px solid var(--line-soft);
+  }
+  .day-card.open .day-body{ display:block; }
+
+  .day-note{
+    color:var(--chalk-dim);
+    font-size:13.5px;
+    padding:14px 0 4px;
+    line-height:1.55;
+    border-bottom:1px solid var(--line-soft);
+    margin-bottom:12px;
+  }
+
+  table.ex-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.ex-table th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--chalk-faint);
+    font-weight:600;
+    padding:8px 8px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  table.ex-table td{
+    padding:10px 8px;
+    border-bottom:1px solid var(--line-soft);
+    vertical-align:top;
+  }
+  table.ex-table tr:last-child td{ border-bottom:none; }
+  .ex-name{ font-weight:600; }
+  .ex-tag{
+    display:inline-block;
+    margin-top:3px;
+    font-size:10.5px;
+    color:var(--ember);
+    background:rgba(255,93,58,0.10);
+    padding:1px 7px;
+    border-radius:20px;
+    letter-spacing:0.3px;
+  }
+  .ex-num{ font-family:var(--font-mono); color:var(--chalk-dim); white-space:nowrap; }
+  .del-x{
+    background:transparent;
+    border:none;
+    color:var(--chalk-faint);
+    cursor:pointer;
+    font-size:15px;
+    padding:2px 6px;
+  }
+  .del-x:hover{ color:var(--ember); }
+
+  .day-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:14px;
+  }
+
+  /* Add exercise inline form */
+  .add-ex-form{
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    padding:14px;
+    margin-top:14px;
+    display:none;
+  }
+  .add-ex-form.open{ display:block; }
+  .add-ex-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  @media (max-width:600px){
+    .add-ex-grid{ grid-template-columns:1fr 1fr; }
+  }
+
+  /* ---------- FAB / new-day form ---------- */
+  .new-day-panel{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:22px;
+    display:none;
+  }
+  .new-day-panel.open{ display:block; }
+  .panel-title{
+    font-family:var(--font-display);
+    font-size:15px;
+    letter-spacing:0.4px;
+    color:var(--chalk-dim);
+    margin:0 0 14px;
+    text-transform:uppercase;
+  }
+
+  .journal-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .journal-toolbar h2{
+    font-family:var(--font-display);
+    font-size:22px;
+    margin:0;
+    letter-spacing:0.3px;
+  }
+  .toolbar-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  /* ---------- Import/Export modal ---------- */
+  .import-modal-card{ text-align:left; }
+  .import-dropzone{
+    border:1px dashed var(--iron);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    background:var(--bg);
+    margin-bottom:12px;
+  }
+  .import-dropzone input[type="file"]{
+    color:var(--chalk-dim);
+    font-size:12.5px;
+    width:100%;
+  }
+  .import-textarea{
+    width:100%;
+    min-height:120px;
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    color:var(--chalk);
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    padding:10px;
+    resize:vertical;
+    box-sizing:border-box;
+  }
+  .import-hint{
+    color:var(--chalk-faint);
+    font-size:12px;
+    line-height:1.6;
+    margin:8px 0 14px;
+  }
+  .import-actions{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+  }
+
+  /* ---------- Skills catalog ---------- */
+  .cat-toolbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    appearance:none;
+    border:1px solid var(--line);
+    background:var(--bg-card);
+    color:var(--chalk-dim);
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .chip.active{
+    background:var(--iron);
+    border-color:var(--iron);
+    color:#0c1120;
+  }
+
+  .skill-group{ margin-bottom:30px; }
+  .skill-group-title{
+    font-family:var(--font-display);
+    font-size:15px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--chalk-faint);
+    margin:0 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .skill-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:12px;
+  }
+  .skill-card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:15px;
+    transition:border-color .15s ease;
+  }
+  .skill-card{ cursor:pointer; }
+  .skill-card:hover{ border-color:var(--ember); }
+  .skill-card:hover .skill-name{ color:var(--ember); }
+  .skill-hint{
+    margin-top:10px;
+    font-size:11px;
+    color:var(--chalk-faint);
+    letter-spacing:0.3px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .skill-hint svg{ flex-shrink:0; }
+  .skill-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .skill-name{
+    font-weight:700;
+    font-size:14.5px;
+    line-height:1.3;
+  }
+  .lvl{
+    flex-shrink:0;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:0.4px;
+    padding:3px 8px;
+    border-radius:20px;
+    white-space:nowrap;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .lvl-1{ background:rgba(69,201,138,0.13); color:var(--good); }
+  .lvl-2{ background:rgba(77,124,255,0.14); color:#8aa8ff; }
+  .lvl-3{ background:rgba(255,93,58,0.14); color:var(--ember); }
+  .lvl-4{ background:rgba(255,255,255,0.09); color:var(--chalk); }
+
+  .skill-desc{
+    color:var(--chalk-dim);
+    font-size:12.8px;
+    line-height:1.55;
+    margin-bottom:8px;
+  }
+  .skill-pre{
+    font-size:11.5px;
+    color:var(--chalk-faint);
+    border-top:1px solid var(--line-soft);
+    padding-top:8px;
+  }
+  .skill-pre b{ color:var(--chalk-dim); font-weight:600; }
+
+  /* ---------- Skill detail modal ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(8,8,10,0.72);
+    backdrop-filter:blur(2px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    max-width:480px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+    padding:22px;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute;
+    top:14px;
+    right:14px;
+    background:transparent;
+    border:none;
+    color:var(--chalk-faint);
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    padding:4px 8px;
+    border-radius:6px;
+  }
+  .modal-close:hover{ color:var(--ember); background:rgba(255,93,58,0.08); }
+  .modal-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:6px;
+    padding-right:24px;
+  }
+  .modal-name{
+    font-family:var(--font-display);
+    font-size:21px;
+    letter-spacing:0.3px;
+    line-height:1.25;
+  }
+  .modal-group{
+    color:var(--chalk-faint);
+    font-size:12px;
+    letter-spacing:0.3px;
+    margin-bottom:16px;
+  }
+  .modal-desc{
+    color:var(--chalk-dim);
+    font-size:13.8px;
+    line-height:1.6;
+    margin-bottom:16px;
+  }
+  .modal-pre{
+    font-size:12.5px;
+    color:var(--chalk-faint);
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:9px;
+    padding:9px 12px;
+    margin-bottom:18px;
+  }
+  .modal-pre b{ color:var(--chalk-dim); font-weight:600; }
+  .modal-tips-title{
+    font-family:var(--font-display);
+    font-size:13px;
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    color:var(--iron);
+    margin:0 0 10px;
+  }
+  .modal-tips-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .modal-tips-list li{
+    display:flex;
+    gap:10px;
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--chalk);
+  }
+  .modal-tips-list li .tip-dot{
+    flex-shrink:0;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:rgba(77,124,255,0.14);
+    color:#8aa8ff;
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:1px;
+  }
+  .modal-no-tips{
+    color:var(--chalk-faint);
+    font-size:13px;
+    font-style:italic;
+  }
+
+  /* ---------- Prep/Rest fields on add-exercise form ---------- */
+  .add-ex-grid2{
+    display:grid;
+    grid-template-columns:1fr 2fr;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  @media (max-width:600px){
+    .add-ex-grid2{ grid-template-columns:1fr; }
+  }
+  .rest-chip-row{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .rest-chip-row .chip{
+    padding:7px 12px;
+    font-size:12px;
+  }
+  .rest-custom-input{ margin-top:8px; }
+
+  .ex-meta-badges{
+    display:flex;
+    gap:6px;
+    margin-top:4px;
+    flex-wrap:wrap;
+  }
+  .ex-badge{
+    font-size:10px;
+    color:var(--chalk-faint);
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    padding:2px 7px;
+    border-radius:10px;
+    font-family:var(--font-mono);
+    white-space:nowrap;
+  }
+  .play-x{
+    background:transparent;
+    border:none;
+    color:var(--iron);
+    cursor:pointer;
+    font-size:13px;
+    padding:2px 6px;
+    margin-right:2px;
+  }
+  .play-x:hover{ color:#8aa8ff; }
+
+  /* ---------- Timer modal ---------- */
+  .timer-modal-card{ text-align:center; }
+  .timer-set-info{
+    font-family:var(--font-mono);
+    color:var(--chalk-faint);
+    font-size:12.5px;
+    letter-spacing:0.4px;
+    margin-bottom:14px;
+  }
+  .timer-phase-badge{
+    display:inline-block;
+    font-family:var(--font-display);
+    font-size:13px;
+    letter-spacing:1.5px;
+    padding:5px 16px;
+    border-radius:20px;
+    margin-bottom:18px;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .timer-phase-prep{ background:rgba(77,124,255,0.14); color:#8aa8ff; }
+  .timer-phase-work{ background:rgba(255,93,58,0.14); color:var(--ember); }
+  .timer-phase-rest{ background:rgba(69,201,138,0.13); color:var(--good); }
+  .timer-phase-done{ background:rgba(255,255,255,0.09); color:var(--chalk); }
+
+  .timer-display{
+    font-family:var(--font-mono);
+    font-size:62px;
+    font-weight:700;
+    letter-spacing:1px;
+    line-height:1;
+    margin:6px 0 22px;
+    color:var(--chalk);
+  }
+  .timer-manual-hint{
+    color:var(--chalk-dim);
+    font-size:13.5px;
+    line-height:1.5;
+    margin-bottom:16px;
+  }
+  .timer-controls{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .timer-controls .btn-primary{ flex:1 1 auto; min-width:130px; }
+
+  /* ---------- Confirm modal ---------- */
+  .confirm-modal-card{ text-align:center; }
+  .confirm-icon{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:rgba(255,93,58,0.14);
+    color:var(--ember);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:4px auto 16px;
+    font-size:20px;
+  }
+  .confirm-title{
+    font-family:var(--font-display);
+    font-size:19px;
+    letter-spacing:0.3px;
+    margin-bottom:10px;
+  }
+  .confirm-message{
+    color:var(--chalk-dim);
+    font-size:13.5px;
+    line-height:1.6;
+    margin-bottom:22px;
+  }
+  .confirm-message b{ color:var(--chalk); font-weight:600; }
+  .confirm-actions{
+    display:flex;
+    gap:10px;
+  }
+  .confirm-actions .btn{ flex:1 1 auto; }
+
+  /* ---------- VIP ---------- */
+  :root{
+    --gold: #f0b93a;
+    --gold-dim: #7a5c14;
+  }
+  .vip-tag-btn{
+    color:var(--gold) !important;
+  }
+  .vip-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.4px;
+    color:#2a1c02;
+    background:linear-gradient(135deg, #ffd873, var(--gold));
+    padding:3px 9px;
+    border-radius:20px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .vip-card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+  }
+  .vip-card.vip-active{
+    border-color:var(--gold-dim);
+    background:linear-gradient(160deg, rgba(240,185,58,0.08), var(--bg-card) 60%);
+  }
+  .vip-price{
+    font-family:var(--font-display);
+    font-size:30px;
+    color:var(--gold);
+    letter-spacing:0.3px;
+  }
+  .vip-price span{
+    font-family:var(--font-body);
+    font-size:13px;
+    color:var(--chalk-faint);
+    font-weight:600;
+  }
+  .vip-section-title{
+    font-family:var(--font-display);
+    font-size:13px;
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+    color:var(--chalk-faint);
+    margin:20px 0 10px;
+  }
+  .vip-momo-box{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:12px;
+    padding:16px;
+    flex-wrap:wrap;
+  }
+  .vip-momo-box img{
+    width:110px;
+    height:110px;
+    border-radius:8px;
+    background:#fff;
+    padding:6px;
+    flex-shrink:0;
+  }
+  .vip-request-box{
+    background:var(--bg);
+    border:1px dashed var(--iron);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-top:14px;
+  }
+  .vip-request-code{
+    font-family:var(--font-mono);
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:2px;
+    color:#8aa8ff;
+  }
+  .vip-note{
+    color:var(--chalk-faint);
+    font-size:12px;
+    line-height:1.6;
+    margin-top:6px;
+  }
+  .vip-unlock-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+  }
+  .vip-unlock-row input{ flex:1; text-transform:uppercase; }
+  .vip-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));
+    gap:10px;
+    margin-top:10px;
+  }
+  .vip-stat-box{
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    padding:14px 10px;
+    text-align:center;
+  }
+  .vip-stat-num{
+    font-family:var(--font-display);
+    font-size:24px;
+    color:var(--gold);
+  }
+  .vip-stat-label{
+    font-size:11px;
+    color:var(--chalk-faint);
+    margin-top:2px;
+  }
+  .vip-locked-overlay{
+    position:relative;
+    filter:blur(3px);
+    opacity:0.45;
+    pointer-events:none;
+    user-select:none;
+  }
+  .vip-locked-wrap{ position:relative; }
+  .vip-locked-badge{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-display);
+    font-size:13px;
+    letter-spacing:0.5px;
+    color:var(--chalk-dim);
+    text-align:center;
+    z-index:2;
+  }
+  .vip-admin-link{
+    background:none;
+    border:none;
+    color:var(--chalk-faint);
+    font-size:10.5px;
+    opacity:0.5;
+    cursor:pointer;
+    margin-top:28px;
+    padding:4px;
+  }
+  .vip-admin-link:hover{ opacity:1; }
+  .vip-admin-box{
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    padding:14px;
+    margin-top:10px;
+  }
+
+  /* ---------- VIP Radar chart (5 tiêu chí) ---------- */
+  .vip-radar-wrap{
+    display:flex;
+    justify-content:center;
+    margin:4px 0 2px;
+  }
+  .vip-radar-svg{
+    width:100%;
+    max-width:300px;
+    height:auto;
+  }
+  .vip-radar-legend{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+    gap:8px;
+    margin-top:14px;
+  }
+  .vip-radar-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    padding:9px 12px;
+    font-size:12.5px;
+  }
+  .vip-radar-icon{ font-size:14px; flex-shrink:0; }
+  .vip-radar-label{ color:var(--chalk-dim); flex:1; }
+  .vip-radar-val{
+    font-family:var(--font-mono);
+    font-weight:700;
+    color:var(--gold);
+    font-size:13px;
+  }
+
+  /* ---------- VIP Monthly progress line chart ---------- */
+  .vip-line-wrap{
+    margin:4px 0 2px;
+  }
+  .vip-line-svg{
+    width:100%;
+    height:auto;
+    overflow:visible;
+  }
+  .vip-line-empty{
+    color:var(--chalk-faint);
+    font-size:12.5px;
+    text-align:center;
+    padding:24px 10px;
+  }
+
+  /* ---------- VIP Max Rep comparison ---------- */
+  .vip-maxrep-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:4px;
+  }
+  .vip-maxrep-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:10px;
+    padding:11px 14px;
+  }
+  .vip-maxrep-name{
+    flex:1;
+    min-width:0;
+    font-weight:600;
+    font-size:13px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .vip-maxrep-vals{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--chalk-dim);
+    flex-shrink:0;
+  }
+  .vip-maxrep-arrow{ color:var(--chalk-faint); }
+  .vip-maxrep-now{
+    font-weight:700;
+    color:var(--chalk);
+    font-size:14px;
+  }
+  .vip-maxrep-delta{
+    flex-shrink:0;
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .vip-maxrep-delta.up{ color:var(--good); background:rgba(69,201,138,0.12); }
+  .vip-maxrep-delta.down{ color:var(--ember); background:rgba(255,93,58,0.12); }
+  .vip-maxrep-delta.same{ color:var(--chalk-faint); background:rgba(154,154,165,0.10); }
+  .vip-maxrep-delta.new{ color:var(--gold); background:rgba(240,185,58,0.12); }
+  .vip-maxrep-empty{
+    color:var(--chalk-faint);
+    font-size:12.5px;
+    text-align:center;
+    padding:16px 10px;
+  }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;
+    bottom:26px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--chalk);
+    color:#141414;
+    font-weight:600;
+    font-size:13.5px;
+    padding:11px 20px;
+    border-radius:30px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:50;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:10px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">IRON<span>LOG</span><span class="vip-badge" id="headerVipBadge" style="display:none;">👑 VIP</span></div>
+      <div class="sub">NHẬT KÝ TẬP LUYỆN CALISTHENICS</div>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-view="journal">Nhật ký</button>
+      <button class="tab-btn" data-view="skills">Danh mục kỹ năng</button>
+      <button class="tab-btn vip-tag-btn" data-view="vip">👑 VIP</button>
+    </nav>
+  </header>
+
+  <!-- ============ JOURNAL VIEW ============ -->
+  <section id="view-journal" class="view active">
+    <div class="journal-toolbar">
+      <h2>Buổi tập</h2>
+      <div class="toolbar-actions">
+        <button class="btn btn-sm" id="btnExportData" title="Xuất toàn bộ nhật ký ra file .json">⬇ Xuất file</button>
+        <button class="btn btn-sm" id="btnOpenImport" title="Khôi phục nhật ký từ file .json">⬆ Nhập file</button>
+        <button class="btn btn-primary" id="btnOpenNewDay">+ Thêm ngày tập</button>
+      </div>
+    </div>
+
+    <div class="new-day-panel" id="newDayPanel">
+      <p class="panel-title">Ngày tập mới</p>
+      <div class="row">
+        <div class="field">
+          <label for="ndDate">Ngày</label>
+          <input type="date" id="ndDate">
+        </div>
+        <div class="field">
+          <label for="ndTitle">Chủ đề buổi tập</label>
+          <input type="text" id="ndTitle" placeholder="VD: Push Day, Skill Practice...">
+        </div>
+      </div>
+      <div class="field">
+        <label for="ndNote">Ghi chú</label>
+        <textarea id="ndNote" rows="2" placeholder="Cảm nhận, thể trạng, mục tiêu buổi tập..."></textarea>
+      </div>
+      <div class="row" style="justify-content:flex-end; gap:8px;">
+        <button class="btn" id="btnCancelNewDay">Hủy</button>
+        <button class="btn btn-primary" id="btnSaveNewDay">Lưu ngày tập</button>
+      </div>
+    </div>
+
+    <div id="daysList"></div>
+    <div class="empty" id="journalEmpty" style="display:none;">
+      <div class="big">Chưa có buổi tập nào</div>
+      Nhấn "+ Thêm ngày tập" để bắt đầu ghi lại hành trình của bạn.
+    </div>
+  </section>
+
+  <!-- ============ SKILLS CATALOG VIEW ============ -->
+  <section id="view-skills" class="view">
+    <div class="journal-toolbar">
+      <h2>Danh mục kỹ năng</h2>
+    </div>
+    <div class="cat-toolbar" id="catToolbar"></div>
+    <div id="skillsContainer"></div>
+  </section>
+
+  <!-- ============ VIP VIEW ============ -->
+  <section id="view-vip" class="view">
+    <div class="journal-toolbar">
+      <h2>👑 VIP</h2>
+    </div>
+    <div id="vipContainer"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="skillModalOverlay">
+  <div class="modal-card" id="skillModalCard"></div>
+</div>
+
+<div class="modal-overlay" id="timerModalOverlay">
+  <div class="modal-card timer-modal-card" id="timerModalCard"></div>
+</div>
+
+<div class="modal-overlay" id="confirmModalOverlay">
+  <div class="modal-card confirm-modal-card" id="confirmModalCard"></div>
+</div>
+
+<div class="modal-overlay" id="importModalOverlay">
+  <div class="modal-card import-modal-card" id="importModalCard"></div>
+</div>
+
+<script>
+/* =========================================================
+   DATA LAYER — LocalStorage
+========================================================= */
+const STORAGE_KEY = 'ironlog_days_v1';
+
+function loadDays(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveDays(days){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(days));
+}
+function uid(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+let days = loadDays();
+let openDayId = null; // which day card is expanded
+let addFormOpenFor = null; // which day has the "add exercise" form open
+
+/* =========================================================
+   TOAST
+========================================================= */
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 1800);
+}
+
+/* =========================================================
+   TABS
+========================================================= */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+view).classList.add('active');
+    if(view === 'vip') renderVip();
+  });
+});
+
+/* =========================================================
+   NEW DAY PANEL
+========================================================= */
+const newDayPanel = document.getElementById('newDayPanel');
+document.getElementById('btnOpenNewDay').addEventListener('click', ()=>{
+  newDayPanel.classList.add('open');
+  document.getElementById('ndDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('ndTitle').focus();
+});
+document.getElementById('btnCancelNewDay').addEventListener('click', ()=>{
+  newDayPanel.classList.remove('open');
+  clearNewDayForm();
+});
+function clearNewDayForm(){
+  document.getElementById('ndDate').value = '';
+  document.getElementById('ndTitle').value = '';
+  document.getElementById('ndNote').value = '';
+}
+document.getElementById('btnSaveNewDay').addEventListener('click', ()=>{
+  const date = document.getElementById('ndDate').value;
+  const title = document.getElementById('ndTitle').value.trim();
+  const note = document.getElementById('ndNote').value.trim();
+  if(!date){
+    showToast('Vui lòng chọn ngày tập');
+    return;
+  }
+  const newDay = {
+    id: uid(),
+    date,
+    title: title || 'Buổi tập',
+    note,
+    exercises: []
+  };
+  days.unshift(newDay);
+  sortDays();
+  saveDays(days);
+  newDayPanel.classList.remove('open');
+  clearNewDayForm();
+  openDayId = newDay.id;
+  renderDays();
+  showToast('Đã thêm ngày tập');
+});
+
+function sortDays(){
+  days.sort((a,b)=> new Date(b.date) - new Date(a.date));
+}
+
+/* =========================================================
+   RENDER JOURNAL
+========================================================= */
+function fmtDate(dstr){
+  const d = new Date(dstr + 'T00:00:00');
+  if(isNaN(d)) return dstr;
+  const days_vi = ['CN','T2','T3','T4','T5','T6','T7'];
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  return `${days_vi[d.getDay()]}, ${dd}/${mm}/${d.getFullYear()}`;
+}
+
+function renderDays(){
+  const list = document.getElementById('daysList');
+  const emptyEl = document.getElementById('journalEmpty');
+  list.innerHTML = '';
+
+  if(days.length === 0){
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  days.forEach(day=>{
+    const card = document.createElement('div');
+    card.className = 'day-card' + (openDayId === day.id ? ' open' : '');
+    card.dataset.id = day.id;
+
+    const exCount = day.exercises.length;
+
+    card.innerHTML = `
+      <div class="day-head" data-toggle="${day.id}">
+        <div class="day-date-block">
+          <div class="day-date">${fmtDate(day.date)}</div>
+          <div class="day-title">${escapeHtml(day.title)}</div>
+        </div>
+        <div class="day-meta">
+          <span class="day-count">${exCount} bài</span>
+          <button class="btn-ghost del-day" data-del="${day.id}" title="Xóa ngày tập">✕</button>
+          <span class="chevron">▸</span>
+        </div>
+      </div>
+      <div class="day-body">
+        ${day.note ? `<div class="day-note">${escapeHtml(day.note)}</div>` : ''}
+        ${exCount === 0
+          ? `<div class="empty" style="padding:24px;">Chưa có bài tập nào trong buổi này.</div>`
+          : renderExTable(day)}
+        <div class="day-actions">
+          <button class="btn btn-sm" data-addex="${day.id}">+ Thêm bài tập</button>
+        </div>
+        <div class="add-ex-form ${addFormOpenFor === day.id ? 'open' : ''}" id="addform-${day.id}">
+          <div class="add-ex-grid">
+            <div class="field" style="margin-bottom:0;">
+              <label>Bài tập</label>
+              <input type="text" id="exName-${day.id}" placeholder="VD: Pull-up, Front Lever...">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Sets</label>
+              <input type="number" min="0" id="exSets-${day.id}" placeholder="3">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Reps</label>
+              <input type="text" id="exReps-${day.id}" placeholder="8-10">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Giữ (giây)</label>
+              <input type="number" min="0" id="exHold-${day.id}" placeholder="20">
+            </div>
+          </div>
+          <div class="add-ex-grid2">
+            <div class="field" style="margin-bottom:0;">
+              <label>Chuẩn bị (giây)</label>
+              <input type="number" min="0" id="exPrep-${day.id}" placeholder="VD: 10">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Nghỉ giữa hiệp</label>
+              <div class="rest-chip-row" id="restChips-${day.id}">
+                ${['60','90','120','150','300','custom'].map(v=>`<button type="button" class="chip rest-chip" data-value="${v}">${v==='custom' ? 'Tùy chọn' : v+'s'}</button>`).join('')}
+              </div>
+              <input type="number" min="0" id="exRestCustom-${day.id}" class="rest-custom-input" placeholder="Số giây tùy chọn" style="display:none;">
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button class="btn btn-sm" data-canceladdex="${day.id}">Hủy</button>
+            <button class="btn btn-sm btn-primary" data-saveaddex="${day.id}">Lưu bài tập</button>
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  attachDayEvents();
+}
+
+function renderExTable(day){
+  let rows = day.exercises.map(ex => `
+    <tr>
+      <td>
+        <div class="ex-name">${escapeHtml(ex.name)}</div>
+        ${(ex.prep || ex.rest) ? `<div class="ex-meta-badges">
+          ${ex.prep ? `<span class="ex-badge">⏱ CB ${ex.prep}s</span>` : ''}
+          ${ex.rest ? `<span class="ex-badge">💤 Nghỉ ${ex.rest}s</span>` : ''}
+        </div>` : ''}
+      </td>
+      <td class="ex-num">${ex.sets ? ex.sets : '—'}</td>
+      <td class="ex-num">${ex.reps ? escapeHtml(ex.reps) : '—'}</td>
+      <td class="ex-num">${ex.hold ? ex.hold + 's' : '—'}</td>
+      <td style="text-align:right; white-space:nowrap;">
+        <button class="play-x" data-timer="${day.id}|${ex.id}" title="Bắt đầu hẹn giờ">▶</button>
+        <button class="del-x" data-delex="${day.id}|${ex.id}" title="Xóa">✕</button>
+      </td>
+    </tr>
+  `).join('');
+
+  return `
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>Bài tập</th>
+          <th>Sets</th>
+          <th>Reps</th>
+          <th>Giữ</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function attachDayEvents(){
+  // toggle open/close
+  document.querySelectorAll('[data-toggle]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('.del-day')) return;
+      const id = el.dataset.toggle;
+      openDayId = (openDayId === id) ? null : id;
+      renderDays();
+    });
+  });
+  // delete day
+  document.querySelectorAll('.del-day').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = el.dataset.del;
+      const day = days.find(d=>d.id === id);
+      if(!day) return;
+      const exCount = day.exercises.length;
+      showConfirmModal({
+        title: 'Xóa buổi tập?',
+        message: `Buổi tập <b>"${escapeHtml(day.title || 'Không tên')}"</b> ngày <b>${escapeHtml(fmtDate(day.date))}</b>${exCount > 0 ? ` cùng <b>${exCount} bài tập</b> đã ghi` : ''} sẽ bị xóa vĩnh viễn và không thể khôi phục.`,
+        confirmLabel: 'Xóa buổi tập',
+        cancelLabel: 'Hủy',
+        onConfirm: ()=>{
+          days = days.filter(d=>d.id !== id);
+          saveDays(days);
+          renderDays();
+          showToast('Đã xóa buổi tập');
+        }
+      });
+    });
+  });
+  // open add-exercise form
+  document.querySelectorAll('[data-addex]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.dataset.addex;
+      addFormOpenFor = (addFormOpenFor === id) ? null : id;
+      renderDays();
+      if(addFormOpenFor === id){
+        setTimeout(()=>{
+          const input = document.getElementById('exName-'+id);
+          if(input) input.focus();
+        }, 0);
+      }
+    });
+  });
+  // cancel add-exercise
+  document.querySelectorAll('[data-canceladdex]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      addFormOpenFor = null;
+      renderDays();
+    });
+  });
+  // rest-time preset chips
+  document.querySelectorAll('.rest-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const wrap = chip.parentElement;
+      const dayId = wrap.id.replace('restChips-','');
+      const customInput = document.getElementById('exRestCustom-'+dayId);
+      const alreadyActive = chip.classList.contains('active');
+      wrap.querySelectorAll('.rest-chip').forEach(c=>c.classList.remove('active'));
+      if(alreadyActive){
+        // tap again to deselect
+        if(customInput){ customInput.style.display = 'none'; customInput.value = ''; }
+        return;
+      }
+      chip.classList.add('active');
+      if(chip.dataset.value === 'custom'){
+        customInput.style.display = 'block';
+        customInput.focus();
+      } else if(customInput){
+        customInput.style.display = 'none';
+        customInput.value = '';
+      }
+    });
+  });
+  // save exercise
+  document.querySelectorAll('[data-saveaddex]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.dataset.saveaddex;
+      const name = document.getElementById('exName-'+id).value.trim();
+      const sets = document.getElementById('exSets-'+id).value.trim();
+      const reps = document.getElementById('exReps-'+id).value.trim();
+      const hold = document.getElementById('exHold-'+id).value.trim();
+      const prep = document.getElementById('exPrep-'+id).value.trim();
+
+      let rest = null;
+      const restWrap = document.getElementById('restChips-'+id);
+      const activeChip = restWrap ? restWrap.querySelector('.chip.active') : null;
+      if(activeChip){
+        if(activeChip.dataset.value === 'custom'){
+          const customVal = document.getElementById('exRestCustom-'+id).value.trim();
+          rest = customVal ? Number(customVal) : null;
+        } else {
+          rest = Number(activeChip.dataset.value);
+        }
+      }
+
+      if(!name){
+        showToast('Nhập tên bài tập');
+        return;
+      }
+      const day = days.find(d=>d.id === id);
+      if(!day) return;
+      day.exercises.push({
+        id: uid(),
+        name,
+        sets: sets ? Number(sets) : null,
+        reps: reps || null,
+        hold: hold ? Number(hold) : null,
+        prep: prep ? Number(prep) : null,
+        rest: rest
+      });
+      saveDays(days);
+      addFormOpenFor = null;
+      openDayId = id;
+      renderDays();
+      showToast('Đã thêm bài tập');
+    });
+  });
+  // delete exercise
+  document.querySelectorAll('[data-delex]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const [dayId, exId] = el.dataset.delex.split('|');
+      const day = days.find(d=>d.id === dayId);
+      if(!day) return;
+      day.exercises = day.exercises.filter(x=>x.id !== exId);
+      saveDays(days);
+      renderDays();
+    });
+  });
+  // open timer for an exercise
+  document.querySelectorAll('[data-timer]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const [dayId, exId] = el.dataset.timer.split('|');
+      openTimerModal(dayId, exId);
+    });
+  });
+}
+
+/* =========================================================
+   WORKOUT TIMER (Chuẩn bị → Thực hiện → Nghỉ)
+========================================================= */
+let timerState = null;
+// { exName, reps, prep, hold, rest, sets, currentSet, phase, remaining, running, intervalId }
+
+function openTimerModal(dayId, exId){
+  const day = days.find(d=>d.id === dayId);
+  if(!day) return;
+  const ex = day.exercises.find(x=>x.id === exId);
+  if(!ex) return;
+
+  pauseTimerInterval();
+
+  const sets = ex.sets && ex.sets > 0 ? ex.sets : 1;
+  const prep = ex.prep && ex.prep > 0 ? ex.prep : 0;
+  const rest = ex.rest && ex.rest > 0 ? ex.rest : 0;
+  const hold = ex.hold && ex.hold > 0 ? ex.hold : 0;
+
+  let phase, remaining;
+  if(prep > 0){ phase = 'prep'; remaining = prep; }
+  else if(hold > 0){ phase = 'work'; remaining = hold; }
+  else{ phase = 'manual'; remaining = 0; }
+
+  timerState = {
+    exName: ex.name,
+    reps: ex.reps,
+    prep, hold, rest, sets,
+    currentSet: 1,
+    phase, remaining,
+    running: false,
+    intervalId: null
+  };
+
+  document.getElementById('timerModalOverlay').classList.add('open');
+  renderTimerModal();
+}
+
+function closeTimerModal(){
+  const overlay = document.getElementById('timerModalOverlay');
+  if(!overlay.classList.contains('open')) return;
+  pauseTimerInterval();
+  overlay.classList.remove('open');
+  timerState = null;
+}
+
+function startTimerInterval(){
+  if(!timerState || timerState.intervalId) return;
+  timerState.running = true;
+  timerState.intervalId = setInterval(()=>{
+    const t = timerState;
+    if(!t) return;
+    if(t.remaining > 0){
+      t.remaining--;
+      if(t.remaining > 0 && t.remaining <= 3){
+        playBeep(600, 80);
+      }
+      if(t.remaining === 0){
+        timerBeep();
+        advanceTimerPhase();
+      }
+    }
+    renderTimerModal();
+  }, 1000);
+  renderTimerModal();
+}
+
+function pauseTimerInterval(){
+  if(!timerState) return;
+  if(timerState.intervalId){
+    clearInterval(timerState.intervalId);
+    timerState.intervalId = null;
+  }
+  timerState.running = false;
+}
+
+function advanceTimerPhase(){
+  const t = timerState;
+  if(!t) return;
+  if(t.phase === 'prep'){
+    if(t.hold > 0){
+      t.phase = 'work';
+      t.remaining = t.hold;
+    } else {
+      t.phase = 'manual';
+      t.remaining = 0;
+      pauseTimerInterval();
+    }
+  } else if(t.phase === 'work'){
+    goToRestOrNext();
+  } else if(t.phase === 'rest'){
+    goToNextSetOrDone();
+  }
+}
+
+function goToRestOrNext(){
+  const t = timerState;
+  if(t.rest > 0){
+    t.phase = 'rest';
+    t.remaining = t.rest;
+  } else {
+    goToNextSetOrDone();
+  }
+}
+
+function goToNextSetOrDone(){
+  const t = timerState;
+  if(t.currentSet < t.sets){
+    t.currentSet++;
+    if(t.prep > 0){ t.phase = 'prep'; t.remaining = t.prep; }
+    else if(t.hold > 0){ t.phase = 'work'; t.remaining = t.hold; }
+    else{ t.phase = 'manual'; t.remaining = 0; pauseTimerInterval(); }
+  } else {
+    t.phase = 'done';
+    t.remaining = 0;
+    pauseTimerInterval();
+    timerBeepDone();
+  }
+}
+
+function manualDoneClick(){
+  goToRestOrNext();
+  if(timerState && timerState.phase !== 'manual' && timerState.phase !== 'done'){
+    startTimerInterval();
+  } else {
+    renderTimerModal();
+  }
+}
+
+function resetTimer(){
+  if(!timerState) return;
+  pauseTimerInterval();
+  const t = timerState;
+  t.currentSet = 1;
+  if(t.prep > 0){ t.phase = 'prep'; t.remaining = t.prep; }
+  else if(t.hold > 0){ t.phase = 'work'; t.remaining = t.hold; }
+  else{ t.phase = 'manual'; t.remaining = 0; }
+  renderTimerModal();
+}
+
+function formatTime(s){
+  const m = Math.floor(s/60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2,'0');
+}
+
+function renderTimerModal(){
+  const t = timerState;
+  if(!t) return;
+  const card = document.getElementById('timerModalCard');
+
+  const phaseLabelMap = {
+    prep:'CHUẨN BỊ', work:'THỰC HIỆN', manual:'THỰC HIỆN', rest:'NGHỈ', done:'HOÀN THÀNH'
+  };
+  const phaseClassMap = {
+    prep:'timer-phase-prep', work:'timer-phase-work', manual:'timer-phase-work', rest:'timer-phase-rest', done:'timer-phase-done'
+  };
+
+  let displayTime;
+  if(t.phase === 'manual') displayTime = '—';
+  else if(t.phase === 'done') displayTime = '✓';
+  else displayTime = formatTime(t.remaining);
+
+  let bodyExtra;
+  if(t.phase === 'manual'){
+    bodyExtra = `
+      <div class="timer-manual-hint">${t.reps ? `Thực hiện ${escapeHtml(t.reps)} reps` : 'Thực hiện hiệp này'}, sau đó bấm nút bên dưới.</div>
+      <button class="btn btn-primary btn-block" id="timerManualDoneBtn">✓ Xong hiệp</button>
+    `;
+  } else if(t.phase === 'done'){
+    bodyExtra = `<div class="timer-manual-hint">Đã hoàn thành ${t.sets} hiệp. Cố lên! 💪</div>`;
+  } else {
+    bodyExtra = `
+      <div class="timer-controls">
+        <button class="btn btn-sm" id="timerResetBtn">↺ Đặt lại</button>
+        <button class="btn btn-primary" id="timerToggleBtn">${t.running ? '⏸ Tạm dừng' : '▶ Bắt đầu'}</button>
+        <button class="btn btn-sm" id="timerSkipBtn">Bỏ qua ⏭</button>
+      </div>
+    `;
+  }
+
+  card.innerHTML = `
+    <button class="modal-close" id="timerModalCloseBtn" aria-label="Đóng">✕</button>
+    <div class="modal-top" style="justify-content:center;">
+      <div class="modal-name">${escapeHtml(t.exName)}</div>
+    </div>
+    <div class="timer-set-info">${t.phase === 'done' ? '' : `Hiệp ${t.currentSet}/${t.sets}`}</div>
+    <div class="timer-phase-badge ${phaseClassMap[t.phase]}">${phaseLabelMap[t.phase]}</div>
+    <div class="timer-display">${displayTime}</div>
+    ${bodyExtra}
+  `;
+
+  document.getElementById('timerModalCloseBtn').addEventListener('click', closeTimerModal);
+  if(t.phase === 'manual'){
+    document.getElementById('timerManualDoneBtn').addEventListener('click', manualDoneClick);
+  } else if(t.phase !== 'done'){
+    document.getElementById('timerResetBtn').addEventListener('click', resetTimer);
+    document.getElementById('timerToggleBtn').addEventListener('click', ()=>{
+      if(timerState.running) pauseTimerInterval(); else startTimerInterval();
+      renderTimerModal();
+    });
+    document.getElementById('timerSkipBtn').addEventListener('click', ()=>{
+      const wasRunning = timerState.running;
+      pauseTimerInterval();
+      timerState.remaining = 0;
+      advanceTimerPhase();
+      if(wasRunning && timerState.phase !== 'manual' && timerState.phase !== 'done'){
+        startTimerInterval();
+      } else {
+        renderTimerModal();
+      }
+    });
+  }
+}
+
+/* ---------- Timer sound / vibration ---------- */
+let _audioCtx = null;
+function getAudioCtx(){
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return null;
+  if(!_audioCtx) _audioCtx = new AC();
+  if(_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function playBeep(freq, duration){
+  try{
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration/1000);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration/1000 + 0.02);
+  }catch(e){ /* audio unavailable */ }
+}
+function timerBeep(){
+  playBeep(880, 160);
+  if(navigator.vibrate) navigator.vibrate(120);
+}
+function timerBeepDone(){
+  playBeep(880, 150);
+  setTimeout(()=>playBeep(1100,150), 180);
+  setTimeout(()=>playBeep(1320,220), 360);
+  if(navigator.vibrate) navigator.vibrate([120,80,120,80,200]);
+}
+
+document.getElementById('timerModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'timerModalOverlay') closeTimerModal();
+});
+
+/* =========================================================
+   GENERIC CONFIRM MODAL (styled warning before destructive actions)
+========================================================= */
+function showConfirmModal(opts){
+  const { title, message, confirmLabel, cancelLabel, onConfirm } = opts;
+  const card = document.getElementById('confirmModalCard');
+  card.innerHTML = `
+    <div class="confirm-icon">⚠</div>
+    <div class="confirm-title">${escapeHtml(title || 'Xác nhận xóa')}</div>
+    <div class="confirm-message">${message || ''}</div>
+    <div class="confirm-actions">
+      <button class="btn btn-block" id="confirmCancelBtn">${escapeHtml(cancelLabel || 'Hủy')}</button>
+      <button class="btn btn-primary btn-block" id="confirmOkBtn">${escapeHtml(confirmLabel || 'Xóa')}</button>
+    </div>
+  `;
+  document.getElementById('confirmModalOverlay').classList.add('open');
+  document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
+  document.getElementById('confirmOkBtn').addEventListener('click', ()=>{
+    closeConfirmModal();
+    if(typeof onConfirm === 'function') onConfirm();
+  });
+}
+function closeConfirmModal(){
+  document.getElementById('confirmModalOverlay').classList.remove('open');
+}
+document.getElementById('confirmModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'confirmModalOverlay') closeConfirmModal();
+});
+
+/* =========================================================
+   EXPORT / IMPORT DATA (sao lưu & khôi phục — dùng cho cả VIP và không VIP)
+========================================================= */
+document.getElementById('btnExportData').addEventListener('click', exportJournalData);
+
+function exportJournalData(){
+  if(!days.length){
+    showToast('Chưa có dữ liệu để xuất');
+    return;
+  }
+  const vipState = loadVipState();
+  const payload = {
+    _format: 'ironlog-backup-v2',
+    exportedAt: new Date().toISOString(),
+    days: days,
+    vip: {
+      expiresAt: vipState.expiresAt || 0,
+      daysLeft: vipDaysLeft()
+    }
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ironlog-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Đã xuất file sao lưu (kèm trạng thái VIP)');
+}
+
+document.getElementById('btnOpenImport').addEventListener('click', openImportModal);
+
+function openImportModal(){
+  renderImportModal();
+  document.getElementById('importModalOverlay').classList.add('open');
+}
+function closeImportModal(){
+  document.getElementById('importModalOverlay').classList.remove('open');
+}
+document.getElementById('importModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'importModalOverlay') closeImportModal();
+});
+
+function renderImportModal(){
+  const card = document.getElementById('importModalCard');
+  card.innerHTML = `
+    <button class="modal-close" id="importModalCloseBtn" aria-label="Đóng">✕</button>
+    <div class="modal-top">
+      <div class="modal-name">⬆ Nhập / khôi phục nhật ký</div>
+    </div>
+    <div class="import-dropzone">
+      <input type="file" id="importFileInput" accept="application/json,.json">
+    </div>
+    <div class="import-hint">Chọn file .json đã xuất trước đó, hoặc dán trực tiếp nội dung file vào ô bên dưới:</div>
+    <textarea class="import-textarea" id="importTextarea" placeholder='{"days":[{"id":"...","date":"...","exercises":[...]}],"vip":{"expiresAt":0}}'></textarea>
+    <div class="import-hint" id="importErrorMsg" style="color:var(--ember); display:none;"></div>
+    <div class="import-actions" style="margin-top:14px;">
+      <button class="btn btn-sm" id="importCancelBtn">Hủy</button>
+      <button class="btn btn-primary btn-sm" id="importConfirmBtn">Nhập dữ liệu</button>
+    </div>
+  `;
+
+  document.getElementById('importModalCloseBtn').addEventListener('click', closeImportModal);
+  document.getElementById('importCancelBtn').addEventListener('click', closeImportModal);
+
+  document.getElementById('importFileInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById('importTextarea').value = reader.result;
+    };
+    reader.onerror = () => {
+      showToast('Không đọc được file');
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('importConfirmBtn').addEventListener('click', ()=>{
+    const errBox = document.getElementById('importErrorMsg');
+    errBox.style.display = 'none';
+    const raw = document.getElementById('importTextarea').value.trim();
+    if(!raw){
+      errBox.textContent = 'Chưa có dữ liệu nào để nhập — chọn file hoặc dán nội dung vào ô trên.';
+      errBox.style.display = 'block';
+      return;
+    }
+    let parsed;
+    try{
+      parsed = JSON.parse(raw);
+    }catch(e){
+      errBox.textContent = 'Nội dung không phải JSON hợp lệ. Kiểm tra lại file đã xuất từ IronLog.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    // Định dạng mới (v2): { days:[...], vip:{ expiresAt, daysLeft } }
+    // Định dạng cũ (v1): mảng buổi tập trực tiếp, không kèm VIP
+    let incomingDays, incomingVip = null;
+    if(Array.isArray(parsed)){
+      incomingDays = parsed;
+    } else if(parsed && typeof parsed === 'object' && Array.isArray(parsed.days)){
+      incomingDays = parsed.days;
+      if(parsed.vip && typeof parsed.vip === 'object'){
+        incomingVip = parsed.vip;
+      }
+    } else {
+      errBox.textContent = 'File không đúng định dạng nhật ký IronLog.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    if(!incomingDays.every(d => d && typeof d === 'object' && Array.isArray(d.exercises))){
+      errBox.textContent = 'File không đúng định dạng nhật ký IronLog.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    const incomingCount = incomingDays.length;
+    const currentCount = days.length;
+    const vipNote = incomingVip
+      ? (incomingVip.expiresAt && incomingVip.expiresAt > Date.now()
+          ? ` Trạng thái <b style="color:var(--gold);">VIP còn ${vipDaysLeftFrom(incomingVip.expiresAt)} ngày</b> trong file cũng sẽ được khôi phục.`
+          : ' File này không có VIP đang hoạt động, trạng thái VIP hiện tại trên máy sẽ được giữ nguyên.')
+      : ' File này là bản sao lưu cũ, không kèm dữ liệu VIP — trạng thái VIP hiện tại trên máy sẽ được giữ nguyên.';
+    showConfirmModal({
+      title: 'Ghi đè dữ liệu hiện tại?',
+      message: `Thao tác này sẽ <b>thay thế toàn bộ ${currentCount} buổi tập</b> hiện có bằng <b>${incomingCount} buổi tập</b> từ file vừa nhập. Dữ liệu cũ trên máy này sẽ mất, không thể khôi phục nếu chưa xuất file trước đó.${vipNote}`,
+      confirmLabel: 'Ghi đè & nhập',
+      cancelLabel: 'Hủy',
+      onConfirm: ()=>{
+        days = incomingDays;
+        saveDays(days);
+        sortDays();
+        renderDays();
+        if(incomingVip && incomingVip.expiresAt && incomingVip.expiresAt > Date.now()){
+          saveVipState({ expiresAt: incomingVip.expiresAt });
+        }
+        updateHeaderVipBadge();
+        closeImportModal();
+        showToast('🎉 Đã khôi phục ' + incomingCount + ' buổi tập');
+      }
+    });
+  });
+}
+
+/* =========================================================
+   VIP SYSTEM
+   - Ví MoMo nhận tiền + Gmail xác nhận thủ công + mã mở khóa
+   - LƯU Ý: đây là file HTML tĩnh, không có server, nên mọi hằng số
+     dưới đây (SĐT, giá, salt, mật khẩu admin) đều nằm trong mã nguồn
+     và có thể bị người dùng rành kỹ thuật xem được qua "View Source".
+     Cơ chế này chỉ ngăn người dùng thông thường, không phải bảo mật
+     tuyệt đối — phù hợp cho quy mô ứng dụng cá nhân/nhỏ lẻ.
+========================================================= */
+const VIP_CONFIG = {
+  momoPhone: '0988636011',
+  priceVnd: 10000,
+  periodLabel: '1 tháng',
+  periodDays: 30,
+  gmail: 'ironlog13@gmail.com',
+  // Không lưu mật khẩu admin dạng chữ thường (plaintext) trong file — chỉ lưu
+  // giá trị băm (hash) của nó. Khi đăng nhập, mật khẩu nhập vào được băm lại
+  // bằng cùng công thức rồi so sánh với giá trị này.
+  adminPasswordHash: 160012105,
+  secretSalt: 'IRONLOG_VIP_SALT_2026_X7Q'
+};
+
+const VIP_STATE_KEY = 'ironlog_vip_state_v1';
+const VIP_REQUEST_KEY = 'ironlog_vip_request_v1';
+
+function loadVipState(){
+  try{
+    const raw = localStorage.getItem(VIP_STATE_KEY);
+    return raw ? JSON.parse(raw) : { expiresAt:0 };
+  }catch(e){ return { expiresAt:0 }; }
+}
+function saveVipState(state){
+  localStorage.setItem(VIP_STATE_KEY, JSON.stringify(state));
+}
+function isVipActive(){
+  const s = loadVipState();
+  return !!(s.expiresAt && s.expiresAt > Date.now());
+}
+function vipDaysLeft(){
+  return vipDaysLeftFrom(loadVipState().expiresAt);
+}
+function vipDaysLeftFrom(expiresAt){
+  if(!expiresAt || expiresAt <= Date.now()) return 0;
+  return Math.max(0, Math.ceil((expiresAt - Date.now()) / 86400000));
+}
+
+function loadVipRequestCode(){
+  return localStorage.getItem(VIP_REQUEST_KEY);
+}
+function ensureVipRequestCode(){
+  let code = loadVipRequestCode();
+  if(!code){
+    code = generateVipRequestCode();
+    localStorage.setItem(VIP_REQUEST_KEY, code);
+  }
+  return code;
+}
+function resetVipRequestCode(){
+  const code = generateVipRequestCode();
+  localStorage.setItem(VIP_REQUEST_KEY, code);
+  return code;
+}
+function generateVipRequestCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // bỏ ký tự dễ nhầm 0/O/1/I
+  let s = '';
+  for(let i=0;i<6;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return 'IL-' + s;
+}
+
+/* Hàm băm đơn giản, tất định (deterministic) — dùng để sinh mã mở khóa
+   từ mã yêu cầu + salt bí mật. Không phải mã hóa mật mã học thật sự,
+   chỉ đủ để "chỉ ai biết salt mới tính đúng mã". */
+function simpleHash(str){
+  let h = 5381;
+  for(let i=0;i<str.length;i++){
+    h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
+  }
+  return h >>> 0;
+}
+function computeVipUnlockCode(requestCode){
+  const raw = (requestCode || '').trim().toUpperCase() + '|' + VIP_CONFIG.secretSalt;
+  const h = simpleHash(raw);
+  let code = h.toString(36).toUpperCase();
+  while(code.length < 6) code = '0' + code;
+  return code.slice(-6);
+}
+
+let vipAdminOpen = false;
+let vipAdminUnlocked = false;
+
+function updateHeaderVipBadge(){
+  const badge = document.getElementById('headerVipBadge');
+  if(!badge) return;
+  badge.style.display = isVipActive() ? 'inline-flex' : 'none';
+}
+
+function renderVip(){
+  const box = document.getElementById('vipContainer');
+  const active = isVipActive();
+  const showPaymentForm = !active;
+  updateHeaderVipBadge();
+
+  let html = '';
+
+  if(active){
+    const days = vipDaysLeft();
+    html += `
+      <div class="vip-card vip-active">
+        <span class="vip-badge">👑 VIP</span>
+        <div style="margin-top:12px; font-family:var(--font-display); font-size:18px;">Cảm ơn bạn đã ủng hộ IronLog!</div>
+        <div class="vip-note" style="margin-top:6px;">Còn lại <b style="color:var(--gold);">${days} ngày</b> VIP.</div>
+      </div>
+
+      <div class="vip-section-title">📊 Thống kê nâng cao (VIP)</div>
+      ${renderVipStatsBlock()}
+    `;
+  }
+
+  if(showPaymentForm){
+    const requestCode = ensureVipRequestCode();
+    const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(VIP_CONFIG.momoPhone);
+    const mailSubject = encodeURIComponent(`[VIP IronLog] Yêu cầu mở VIP - ${requestCode}`);
+    const mailBody = encodeURIComponent(
+`Xin chào,
+
+Tôi đã chuyển khoản ${VIP_CONFIG.priceVnd.toLocaleString('vi-VN')}đ qua MoMo để mở VIP IronLog.
+Mã yêu cầu của tôi: ${requestCode}
+
+Mong nhận được mã mở khóa. Cảm ơn!`
+    );
+    const mailtoLink = `mailto:${VIP_CONFIG.gmail}?subject=${mailSubject}&body=${mailBody}`;
+
+    html += `
+      <div class="vip-card">
+        <div class="vip-price">${VIP_CONFIG.priceVnd.toLocaleString('vi-VN')}đ <span>/ ${VIP_CONFIG.periodLabel}</span></div>
+        <div class="vip-note">Mở khóa thống kê nâng cao và huy hiệu VIP.</div>
+
+        <div class="vip-section-title">1. Quét mã QR để chuyển khoản qua MoMo</div>
+        <div class="vip-momo-box">
+          <img src="${qrUrl}" alt="QR MoMo">
+          <div style="flex:1; min-width:180px;">
+            <div class="vip-note" style="margin-top:0;">Mở app MoMo → quét mã QR bên cạnh → chuyển đúng số tiền ${VIP_CONFIG.priceVnd.toLocaleString('vi-VN')}đ.</div>
+          </div>
+        </div>
+
+        <div class="vip-section-title">2. Ghi đúng mã này vào nội dung chuyển khoản</div>
+        <div class="vip-request-box">
+          <div class="vip-request-code" id="vipRequestCodeText">${requestCode}</div>
+          <div class="vip-note">Đây là mã riêng của thiết bị bạn — bắt buộc ghi vào nội dung chuyển khoản để được xác nhận đúng.</div>
+          <button class="btn btn-sm" id="vipCopyRequestBtn" style="margin-top:8px;">📋 Sao chép mã</button>
+        </div>
+
+        <div class="vip-section-title">3. Gửi email xác nhận</div>
+        <div class="vip-note" style="margin-bottom:8px;">Sau khi chuyển khoản xong, bấm nút bên dưới để mở email đã điền sẵn nội dung, gửi cho admin để nhận mã mở khóa.</div>
+        <a class="btn btn-primary btn-sm" href="${mailtoLink}" style="text-decoration:none; display:inline-block;">📧 Gửi email xác nhận đã chuyển khoản</a>
+
+        <div class="vip-section-title">4. Nhập mã mở khóa</div>
+        <div class="vip-note" style="margin-bottom:6px;">Admin sẽ trả lời email với 1 mã mở khóa gồm 6 ký tự. Nhập vào đây:</div>
+        <div class="vip-unlock-row">
+          <input type="text" id="vipUnlockInput" placeholder="VD: A1B2C3" maxlength="6">
+          <button class="btn btn-primary btn-sm" id="vipUnlockBtn">Kích hoạt VIP</button>
+        </div>
+      </div>
+    `;
+  }
+
+  if(!active){
+    html += `
+      <div class="vip-locked-wrap">
+        <div class="vip-locked-overlay">
+          <div class="vip-section-title">📊 Thống kê nâng cao</div>
+          ${renderVipStatsBlock()}
+        </div>
+        <div class="vip-locked-badge">🔒 Mở khóa bằng VIP</div>
+      </div>
+    `;
+  }
+
+  html += `
+    <button class="vip-admin-link" id="vipAdminToggle">Quản trị</button>
+    <div id="vipAdminArea"></div>
+  `;
+
+  box.innerHTML = html;
+  attachVipEvents(active);
+  renderVipAdminArea();
+}
+
+function renderVipStatsBlock(){
+  const totalDays = days.length;
+  const totalEx = days.reduce((sum, d) => sum + d.exercises.length, 0);
+  const streak = computeStreak();
+  return `
+    <div class="vip-card" style="margin-top:0;">
+      <div class="vip-stats-grid">
+        <div class="vip-stat-box"><div class="vip-stat-num">${totalDays}</div><div class="vip-stat-label">Buổi tập</div></div>
+        <div class="vip-stat-box"><div class="vip-stat-num">${totalEx}</div><div class="vip-stat-label">Bài tập đã ghi</div></div>
+        <div class="vip-stat-box"><div class="vip-stat-num">${streak}</div><div class="vip-stat-label">Ngày liên tiếp</div></div>
+      </div>
+    </div>
+    ${renderVipRadarBlock()}
+    ${renderVipMonthlyLineChart()}
+    ${renderVipMaxRepComparisonBlock()}
+  `;
+}
+
+function computeStreak(){
+  if(days.length === 0) return 0;
+  const dateSet = new Set(days.map(d => d.date));
+  let streak = 0;
+  let cursor = new Date();
+  cursor.setHours(0,0,0,0);
+  while(true){
+    const iso = cursor.toISOString().slice(0,10);
+    if(dateSet.has(iso)){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+/* =========================================================
+   VIP RADAR CHART — 3 tiêu chí: Sức bền / Sức mạnh phát lực /
+   Sức mạnh tĩnh.
+   Tất cả tính từ khối lượng tập tích lũy (sets × reps hoặc
+   sets × giây giữ), sau đó quy đổi thành tỉ lệ phần trăm
+   TƯƠNG ĐỐI giữa 3 tiêu chí với nhau (tổng luôn = 100%).
+========================================================= */
+const RADAR_POWER_KEYWORDS = ['jump','nhảy','bật','clap','vỗ tay','kip','muscle-up','muscle up','muscleup','burpee','plyo','explosive','bùng nổ','box jump','sprint','bật nhảy','360'];
+const RADAR_STATIC_KEYWORDS = ['lever','planche','l-sit','lsit','hollow','handstand','trồng chuối','wall sit','flag','dead hang','treo xà','giữ','tĩnh','support hold','iso hold','tuck hold','plank'];
+
+function parseRepsAvg(repsStr){
+  if(!repsStr) return 0;
+  const nums = String(repsStr).match(/\d+(\.\d+)?/g);
+  if(!nums || !nums.length) return 0;
+  const values = nums.map(Number);
+  return values.reduce((a,b)=>a+b,0) / values.length;
+}
+
+function saturatingPct(raw, k){
+  if(!raw || raw <= 0) return 0;
+  const pct = 100 * raw / (raw + k);
+  return Math.min(99, Math.round(pct)); // luôn < 100%, không bao giờ chạm mức tối đa
+}
+
+function computeVipRadarScores(){
+  let enduranceVolume = 0; // sets × reps (bài rep thường)
+  let powerVolume = 0;     // sets × reps (bài bùng nổ/phát lực)
+  let staticSeconds = 0;   // sets × giây giữ (bài tĩnh/isometric)
+
+  days.forEach(day=>{
+    (day.exercises || []).forEach(ex=>{
+      const nameLower = (ex.name || '').toLowerCase();
+      const sets = ex.sets && ex.sets > 0 ? ex.sets : 1;
+      const holdSec = ex.hold && ex.hold > 0 ? ex.hold : 0;
+      const repsAvg = parseRepsAvg(ex.reps);
+
+      const isPower = RADAR_POWER_KEYWORDS.some(k => nameLower.includes(k));
+      const isStaticName = RADAR_STATIC_KEYWORDS.some(k => nameLower.includes(k));
+
+      if(holdSec > 0 || (isStaticName && !isPower)){
+        const effectiveHold = holdSec > 0 ? holdSec : Math.max(repsAvg, 10);
+        staticSeconds += sets * effectiveHold;
+      } else if(isPower){
+        powerVolume += sets * Math.max(repsAvg, 1);
+      } else {
+        enduranceVolume += sets * Math.max(repsAvg, 1);
+      }
+    });
+  });
+
+  // Hệ số bán-bão-hòa (k): giá trị raw = k → đạt ~50% (điểm "thô" trước
+  // khi quy đổi tương đối). Dùng để cân bằng thang đo giữa 3 tiêu chí
+  // có đơn vị khác nhau (reps vs giây) trước khi tính tỉ lệ %.
+  const K_ENDURANCE = 450;
+  const K_POWER = 75;
+  const K_STATIC = 900;
+
+  const enduranceRaw = saturatingPct(enduranceVolume, K_ENDURANCE);
+  const powerRaw = saturatingPct(powerVolume, K_POWER);
+  const staticRaw = saturatingPct(staticSeconds, K_STATIC);
+
+  // Quy đổi 3 điểm thô thành tỉ lệ phần trăm TƯƠNG ĐỐI với nhau,
+  // tổng luôn bằng 100% (nếu có ít nhất 1 tiêu chí > 0).
+  const sumRaw = enduranceRaw + powerRaw + staticRaw;
+  let endurancePct = 0, powerPct = 0, staticPct = 0;
+  if(sumRaw > 0){
+    endurancePct = Math.round(100 * enduranceRaw / sumRaw);
+    powerPct = Math.round(100 * powerRaw / sumRaw);
+    staticPct = 100 - endurancePct - powerPct; // đảm bảo tổng đúng 100%
+  }
+
+  return {
+    endurance: endurancePct,
+    power: powerPct,
+    staticStrength: staticPct,
+    raw: {
+      enduranceVolume: Math.round(enduranceVolume),
+      powerVolume: Math.round(powerVolume),
+      staticSeconds: Math.round(staticSeconds)
+    }
+  };
+}
+
+function renderVipRadarBlock(){
+  const scores = computeVipRadarScores();
+  const axes = [
+    { label:'Sức bền',              short:'Sức bền',   value:scores.endurance,      icon:'💪' },
+    { label:'Sức mạnh phát lực',    short:'Phát lực',  value:scores.power,          icon:'⚡' },
+    { label:'Sức mạnh tĩnh',        short:'Tĩnh',      value:scores.staticStrength, icon:'🧘' },
+  ];
+
+  const cx = 150, cy = 148, maxR = 100;
+  const n = axes.length;
+  const angleFor = i => -Math.PI/2 + i * (2*Math.PI/n);
+  const pointAt = (i, r) => {
+    const a = angleFor(i);
+    return [ +(cx + r*Math.cos(a)).toFixed(1), +(cy + r*Math.sin(a)).toFixed(1) ];
+  };
+
+  const gridPolys = [20,40,60,80,100].map(lvl=>{
+    const r = maxR * lvl/100;
+    const pts = axes.map((_,i)=> pointAt(i,r).join(',')).join(' ');
+    return `<polygon points="${pts}" fill="none" stroke="var(--line)" stroke-width="1" opacity="${lvl===100?0.6:0.35}"/>`;
+  }).join('');
+
+  const axisLines = axes.map((_,i)=>{
+    const [x,y] = pointAt(i, maxR);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1" opacity="0.5"/>`;
+  }).join('');
+
+  const valuePts = axes.map((ax,i)=> pointAt(i, maxR * Math.max(ax.value,2)/100).join(',')).join(' ');
+  const valueDots = axes.map((ax,i)=>{
+    const [x,y] = pointAt(i, maxR * Math.max(ax.value,2)/100);
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="var(--gold)"/>`;
+  }).join('');
+
+  const labels = axes.map((ax,i)=>{
+    const [x,y] = pointAt(i, maxR + 28);
+    const a = angleFor(i);
+    let anchor = 'middle';
+    if(Math.cos(a) > 0.3) anchor = 'start';
+    else if(Math.cos(a) < -0.3) anchor = 'end';
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" font-size="11" font-weight="600" fill="var(--chalk-dim)">${escapeHtml(ax.short)}</text>`;
+  }).join('');
+
+  const svg = `
+    <svg viewBox="0 0 300 296" class="vip-radar-svg">
+      ${gridPolys}
+      ${axisLines}
+      <polygon points="${valuePts}" fill="rgba(240,185,58,0.22)" stroke="var(--gold)" stroke-width="2"/>
+      ${valueDots}
+      ${labels}
+    </svg>
+  `;
+
+  const legend = axes.map(ax => `
+    <div class="vip-radar-item">
+      <span class="vip-radar-icon">${ax.icon}</span>
+      <span class="vip-radar-label">${escapeHtml(ax.label)}</span>
+      <span class="vip-radar-val">${ax.value}%</span>
+    </div>
+  `).join('');
+
+  return `
+    <div class="vip-card" style="margin-top:0;">
+      <div class="vip-section-title" style="margin-top:0;">🕸️ Biểu đồ 3 tiêu chí thể lực</div>
+      <div class="vip-radar-wrap">${svg}</div>
+      <div class="vip-radar-legend">${legend}</div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   VIP — BIỂU ĐỒ TIẾN ĐỘ THEO THÁNG (đường)
+   Mỗi tháng: tổng "điểm khối lượng" = khối lượng bền + khối
+   lượng phát lực + (giây giữ tĩnh / 10), tính từ mọi buổi tập
+   trong tháng đó. Hiển thị 6 tháng gần nhất để thấy xu hướng
+   nâng cấp qua thời gian.
+========================================================= */
+function getMonthKey(dateStr){
+  return (dateStr || '').slice(0,7); // "YYYY-MM"
+}
+
+function getMonthShortLabel(monthKey){
+  const [y,m] = monthKey.split('-');
+  return `Th${Number(m)}/${y.slice(2)}`;
+}
+
+function computeMonthVolumeScore(monthDays){
+  let enduranceVolume = 0, powerVolume = 0, staticSeconds = 0;
+  monthDays.forEach(day=>{
+    (day.exercises || []).forEach(ex=>{
+      const nameLower = (ex.name || '').toLowerCase();
+      const sets = ex.sets && ex.sets > 0 ? ex.sets : 1;
+      const holdSec = ex.hold && ex.hold > 0 ? ex.hold : 0;
+      const repsAvg = parseRepsAvg(ex.reps);
+      const isPower = RADAR_POWER_KEYWORDS.some(k => nameLower.includes(k));
+      const isStaticName = RADAR_STATIC_KEYWORDS.some(k => nameLower.includes(k));
+      if(holdSec > 0 || (isStaticName && !isPower)){
+        const effectiveHold = holdSec > 0 ? holdSec : Math.max(repsAvg, 10);
+        staticSeconds += sets * effectiveHold;
+      } else if(isPower){
+        powerVolume += sets * Math.max(repsAvg, 1);
+      } else {
+        enduranceVolume += sets * Math.max(repsAvg, 1);
+      }
+    });
+  });
+  return Math.round(enduranceVolume + powerVolume + staticSeconds/10);
+}
+
+function computeMonthlyVolumeSeries(monthsCount){
+  const n = monthsCount || 6;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const months = [];
+  for(let i = n-1; i >= 0; i--){
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    months.push(key);
+  }
+  return months.map(key=>{
+    const monthDays = days.filter(d => getMonthKey(d.date) === key);
+    return {
+      key,
+      label: getMonthShortLabel(key),
+      value: computeMonthVolumeScore(monthDays)
+    };
+  });
+}
+
+function renderVipMonthlyLineChart(){
+  const series = computeMonthlyVolumeSeries(6);
+  const hasData = series.some(p => p.value > 0);
+
+  if(!hasData){
+    return `
+      <div class="vip-card" style="margin-top:0;">
+        <div class="vip-section-title" style="margin-top:0;">📈 Tiến độ nâng cấp qua từng tháng</div>
+        <div class="vip-line-empty">Chưa có đủ dữ liệu tập luyện để vẽ biểu đồ. Ghi lại vài buổi tập để thấy xu hướng nâng cấp theo tháng.</div>
+      </div>
+    `;
+  }
+
+  const w = 320, h = 200;
+  const padL = 34, padR = 14, padT = 16, padB = 28;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const maxVal = Math.max(...series.map(p=>p.value), 1);
+  const niceMax = maxVal <= 10 ? Math.max(maxVal, 4) : Math.ceil(maxVal * 1.15);
+
+  const n = series.length;
+  const xAt = i => n === 1 ? padL + plotW/2 : padL + (i * plotW / (n-1));
+  const yAt = v => padT + plotH - (v / niceMax) * plotH;
+
+  const pts = series.map((p,i)=>[xAt(i), yAt(p.value)]);
+  const linePath = pts.map((pt,i)=> (i===0?'M':'L') + pt[0].toFixed(1) + ',' + pt[1].toFixed(1)).join(' ');
+  const areaPath = linePath +
+    ` L${pts[pts.length-1][0].toFixed(1)},${(padT+plotH).toFixed(1)}` +
+    ` L${pts[0][0].toFixed(1)},${(padT+plotH).toFixed(1)} Z`;
+
+  const gridLines = [0,0.25,0.5,0.75,1].map(f=>{
+    const y = padT + plotH * f;
+    return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}" stroke="var(--line)" stroke-width="1" opacity="0.4"/>`;
+  }).join('');
+
+  const yLabels = [0,0.5,1].map(f=>{
+    const val = Math.round(niceMax * (1-f));
+    const y = padT + plotH * f;
+    return `<text x="${padL-8}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="9.5" fill="var(--chalk-faint)">${val}</text>`;
+  }).join('');
+
+  const xLabels = series.map((p,i)=>{
+    const x = xAt(i);
+    return `<text x="${x.toFixed(1)}" y="${h-8}" text-anchor="middle" font-size="9.5" fill="var(--chalk-faint)">${escapeHtml(p.label)}</text>`;
+  }).join('');
+
+  const dots = pts.map((pt,i)=>`
+    <circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="3.5" fill="var(--gold)"/>
+    <text x="${pt[0].toFixed(1)}" y="${(pt[1]-10).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--gold)">${series[i].value}</text>
+  `).join('');
+
+  const svg = `
+    <svg viewBox="0 0 ${w} ${h}" class="vip-line-svg" preserveAspectRatio="xMidYMid meet">
+      ${gridLines}
+      ${yLabels}
+      <path d="${areaPath}" fill="rgba(240,185,58,0.16)" stroke="none"/>
+      <path d="${linePath}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      ${xLabels}
+    </svg>
+  `;
+
+  return `
+    <div class="vip-card" style="margin-top:0;">
+      <div class="vip-section-title" style="margin-top:0;">📈 Tiến độ nâng cấp qua từng tháng</div>
+      <div class="vip-note" style="margin-top:0;">Điểm khối lượng tập luyện (bền + phát lực + tĩnh) theo 6 tháng gần nhất.</div>
+      <div class="vip-line-wrap">${svg}</div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   VIP — SO SÁNH MAX REP THEO BÀI: THÁNG NÀY vs THÁNG TRƯỚC
+   Max Rep = số rep lớn nhất từng ghi nhận trong 1 set của bài
+   đó, trong tháng tương ứng (lấy số lớn nhất xuất hiện trong
+   ô "reps", ví dụ "8,10,12" -> 12).
+========================================================= */
+function parseRepsMax(repsStr){
+  if(!repsStr) return 0;
+  const nums = String(repsStr).match(/\d+(\.\d+)?/g);
+  if(!nums || !nums.length) return 0;
+  return Math.max(...nums.map(Number));
+}
+
+function computeMaxRepByExerciseForMonth(monthKey){
+  const map = {}; // nameLower -> { name, max }
+  days.filter(d => getMonthKey(d.date) === monthKey).forEach(day=>{
+    (day.exercises || []).forEach(ex=>{
+      if(!ex.name) return;
+      const maxRep = parseRepsMax(ex.reps);
+      if(maxRep <= 0) return; // bỏ qua bài tĩnh/không có số rep (vd giữ theo giây)
+      const key = ex.name.trim().toLowerCase();
+      if(!map[key] || maxRep > map[key].max){
+        map[key] = { name: ex.name.trim(), max: maxRep };
+      }
+    });
+  });
+  return map;
+}
+
+function computeMaxRepComparison(){
+  const today = new Date();
+  const thisKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  const prevDate = new Date(today.getFullYear(), today.getMonth()-1, 1);
+  const prevKey = `${prevDate.getFullYear()}-${String(prevDate.getMonth()+1).padStart(2,'0')}`;
+
+  const thisMap = computeMaxRepByExerciseForMonth(thisKey);
+  const prevMap = computeMaxRepByExerciseForMonth(prevKey);
+
+  const allKeys = new Set([...Object.keys(thisMap), ...Object.keys(prevMap)]);
+  const rows = [...allKeys].map(key=>{
+    const thisVal = thisMap[key] ? thisMap[key].max : null;
+    const prevVal = prevMap[key] ? prevMap[key].max : null;
+    const name = (thisMap[key] || prevMap[key]).name;
+    let delta = null;
+    if(thisVal !== null && prevVal !== null) delta = thisVal - prevVal;
+    return { name, thisVal, prevVal, delta };
+  });
+
+  // Ưu tiên hiển thị bài có dữ liệu tháng này trước, sắp theo mức tăng giảm nhiều nhất
+  rows.sort((a,b)=>{
+    if((a.thisVal===null) !== (b.thisVal===null)) return a.thisVal===null ? 1 : -1;
+    const da = a.delta === null ? -Infinity : Math.abs(a.delta);
+    const db = b.delta === null ? -Infinity : Math.abs(b.delta);
+    return db - da;
+  });
+
+  return { thisKey, prevKey, rows };
+}
+
+function renderVipMaxRepComparisonBlock(){
+  const { thisKey, prevKey, rows } = computeMaxRepComparison();
+
+  if(!rows.length){
+    return `
+      <div class="vip-card" style="margin-top:0;">
+        <div class="vip-section-title" style="margin-top:0;">🆚 Max Rep: ${escapeHtml(getMonthShortLabel(thisKey))} so với ${escapeHtml(getMonthShortLabel(prevKey))}</div>
+        <div class="vip-maxrep-empty">Chưa có bài tập nào có số rep để so sánh giữa hai tháng.</div>
+      </div>
+    `;
+  }
+
+  const items = rows.map(r=>{
+    let deltaHtml;
+    if(r.thisVal === null){
+      deltaHtml = `<span class="vip-maxrep-delta same">Chưa tập lại</span>`;
+    } else if(r.prevVal === null){
+      deltaHtml = `<span class="vip-maxrep-delta new">MỚI</span>`;
+    } else if(r.delta > 0){
+      deltaHtml = `<span class="vip-maxrep-delta up">▲ +${r.delta}</span>`;
+    } else if(r.delta < 0){
+      deltaHtml = `<span class="vip-maxrep-delta down">▼ ${r.delta}</span>`;
+    } else {
+      deltaHtml = `<span class="vip-maxrep-delta same">= 0</span>`;
+    }
+
+    const prevDisplay = r.prevVal === null ? '—' : r.prevVal;
+    const thisDisplay = r.thisVal === null ? '—' : r.thisVal;
+
+    return `
+      <div class="vip-maxrep-item">
+        <div class="vip-maxrep-name">${escapeHtml(r.name)}</div>
+        <div class="vip-maxrep-vals">
+          <span>${prevDisplay}</span>
+          <span class="vip-maxrep-arrow">→</span>
+          <span class="vip-maxrep-now">${thisDisplay}</span>
+        </div>
+        ${deltaHtml}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="vip-card" style="margin-top:0;">
+      <div class="vip-section-title" style="margin-top:0;">🆚 Max Rep: ${escapeHtml(getMonthShortLabel(thisKey))} so với ${escapeHtml(getMonthShortLabel(prevKey))}</div>
+      <div class="vip-note" style="margin-top:0;">Số rep cao nhất từng ghi nhận trong 1 hiệp, theo từng bài tập.</div>
+      <div class="vip-maxrep-list">${items}</div>
+    </div>
+  `;
+}
+
+function attachVipEvents(active){
+  const copyReqBtn = document.getElementById('vipCopyRequestBtn');
+  if(copyReqBtn){
+    copyReqBtn.addEventListener('click', ()=>{
+      copyToClipboard(loadVipRequestCode() || '');
+      showToast('Đã sao chép mã yêu cầu');
+    });
+  }
+  const unlockBtn = document.getElementById('vipUnlockBtn');
+  if(unlockBtn){
+    unlockBtn.addEventListener('click', tryActivateVip);
+  }
+  const unlockInput = document.getElementById('vipUnlockInput');
+  if(unlockInput){
+    unlockInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter') tryActivateVip();
+    });
+  }
+}
+
+function tryActivateVip(){
+  const input = document.getElementById('vipUnlockInput');
+  const entered = (input.value || '').trim().toUpperCase();
+  if(!entered){
+    showToast('Nhập mã mở khóa');
+    return;
+  }
+  const requestCode = loadVipRequestCode();
+  if(!requestCode){
+    showToast('Không tìm thấy mã yêu cầu, thử tải lại trang');
+    return;
+  }
+  const expected = computeVipUnlockCode(requestCode);
+  if(entered !== expected){
+    showToast('Mã mở khóa không đúng');
+    return;
+  }
+  const s = loadVipState();
+  const base = (s.expiresAt && s.expiresAt > Date.now()) ? s.expiresAt : Date.now();
+  const newExpiry = base + VIP_CONFIG.periodDays * 86400000;
+  saveVipState({ expiresAt:newExpiry });
+  localStorage.removeItem(VIP_REQUEST_KEY); // vô hiệu hóa mã yêu cầu đã dùng
+  showToast('🎉 Đã kích hoạt VIP!');
+  renderVip();
+}
+
+function copyToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(()=>{});
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ---------- Admin area (ẩn, chỉ để tính mã mở khóa từ mã yêu cầu khách gửi) ---------- */
+function renderVipAdminArea(){
+  const area = document.getElementById('vipAdminArea');
+  if(!area) return;
+
+  if(!vipAdminOpen){
+    area.innerHTML = '';
+    const toggle = document.getElementById('vipAdminToggle');
+    if(toggle){
+      toggle.onclick = ()=>{
+        vipAdminOpen = true;
+        renderVipAdminArea();
+      };
+    }
+    return;
+  }
+
+  if(!vipAdminUnlocked){
+    area.innerHTML = `
+      <div class="vip-admin-box">
+        <div class="vip-note" style="margin-bottom:8px;">Nhập mật khẩu quản trị:</div>
+        <div style="display:flex; gap:8px;">
+          <input type="password" id="vipAdminPass" placeholder="Mật khẩu">
+          <button class="btn btn-sm" id="vipAdminLoginBtn">Vào</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('vipAdminLoginBtn').addEventListener('click', ()=>{
+      const val = document.getElementById('vipAdminPass').value;
+      if(simpleHash(val) === VIP_CONFIG.adminPasswordHash){
+        vipAdminUnlocked = true;
+        renderVipAdminArea();
+      } else {
+        showToast('Sai mật khẩu');
+      }
+    });
+    document.getElementById('vipAdminPass').addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter') document.getElementById('vipAdminLoginBtn').click();
+    });
+    return;
+  }
+
+  area.innerHTML = `
+    <div class="vip-admin-box">
+      <div class="vip-note" style="margin-bottom:8px;">Dán <b>mã yêu cầu</b> khách gửi qua email vào đây để tính mã mở khóa:</div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="vipAdminReqInput" placeholder="VD: IL-XXXXXX">
+        <button class="btn btn-sm btn-primary" id="vipAdminComputeBtn">Tính mã</button>
+      </div>
+      <div id="vipAdminResult" style="margin-top:12px;"></div>
+    </div>
+  `;
+  document.getElementById('vipAdminComputeBtn').addEventListener('click', ()=>{
+    const req = document.getElementById('vipAdminReqInput').value.trim();
+    if(!req){ showToast('Nhập mã yêu cầu'); return; }
+    const unlock = computeVipUnlockCode(req);
+    document.getElementById('vipAdminResult').innerHTML = `
+      Mã mở khóa cho <b>${escapeHtml(req.toUpperCase())}</b>:
+      <div class="vip-request-code" style="margin-top:6px;">${unlock}</div>
+      <div class="vip-note">Gửi mã này lại cho khách qua email trả lời.</div>
+    `;
+  });
+}
+
+/* =========================================================
+   SKILLS CATALOG DATA
+========================================================= */
+const SKILLS = [
+  {
+    group: 'Đẩy (Push)',
+    items: [
+      { name:'Knee Push-up', level:1, desc:'Chống đẩy với gối tựa sàn, giảm tải trọng lượng cơ thể, phù hợp cho người mới bắt đầu làm quen kỹ thuật.', pre:'Không', tips:['Giữ hông – đầu gối – vai thẳng hàng, không võng lưng.','Tay đặt rộng hơn vai một chút, ngón tay hướng về trước.','Hạ ngực gần chạm sàn rồi mới đẩy lên, thở ra khi đẩy.'] },
+      { name:'Standard Push-up', level:1, desc:'Chống đẩy tiêu chuẩn toàn thân thẳng, nền tảng sức mạnh ngực – vai – tay sau của mọi bài đẩy.', pre:'Knee Push-up 10-15 reps', tips:['Siết bụng và mông để toàn thân thẳng như một tấm ván.','Khuỷu tay hợp góc ~45° với thân, không xoè ngang 90°.','Hạ tới khi ngực gần chạm sàn, giữ cổ trung tính (nhìn xuống).'] },
+      { name:'Diamond Push-up', level:1, desc:'Hai tay khép sát tạo hình viên kim cương dưới ngực, tăng cường độ cho tay sau (triceps).', pre:'Standard Push-up 15 reps', tips:['Ngón cái và ngón trỏ hai tay chạm nhau ngay dưới ngực.','Khuỷu tay ép sát thân trong suốt biên độ.','Khởi động kỹ cổ tay/khuỷu tay vì áp lực dồn nhiều vào triceps.'] },
+      { name:'Pike Push-up', level:1, desc:'Gập người hình chữ V, đẩy vai để làm quen với tư thế chống đẩy trên đầu, nền tảng cho Handstand Push-up.', pre:'Push-up cơ bản', tips:['Nâng hông cao để thân gần vuông góc với sàn.','Đỉnh đầu hướng xuống điểm giữa hai tay khi hạ.','Tập trung đẩy bằng vai, không chỉ gập khuỷu tay.'] },
+      { name:'Dips (xà kép)', level:1, desc:'Đẩy thân trên xà kép, tập trung vào ngực – vai trước – tay sau, kiểm soát biên độ đầy đủ.', pre:'Push-up 15 reps', tips:['Giữ vai thấp, tránh nhún vai lên gần tai.','Hạ tới khi khuỷu tay ~90°, chưa xuống sâu hơn nếu vai còn yếu.','Nghiêng người nhẹ về trước để tăng kích hoạt ngực.'] },
+      { name:'Archer Push-up', level:2, desc:'Chống đẩy lệch một bên, tay còn lại duỗi thẳng sang ngang, tăng tải một bên để chuẩn bị cho One Arm Push-up.', pre:'Diamond Push-up 12 reps', tips:['Dồn phần lớn trọng lượng sang tay đang tập.','Tay còn lại gần như chỉ chạm sàn để giữ thăng bằng.','Giữ hông vuông, tránh xoay thân khi hạ xuống.'] },
+      { name:'Pseudo Planche Push-up', level:2, desc:'Chống đẩy với tay xoay ra sau, vai đẩy quá cổ tay để làm quen cảm giác chịu lực của Planche.', pre:'Dips, Pike Push-up', tips:['Chỉ xoay ngón tay ra sau nếu cổ tay đủ linh hoạt, nếu không để tay hướng chéo ra ngoài.','Đẩy vai về phía trước, vượt qua cổ tay.','Siết core chống sập lưng trong suốt bài tập.'] },
+      { name:'Planche Lean', level:2, desc:'Nghiêng người về phía trước ở tư thế plank tay thẳng, xây dựng sức mạnh vai và cổ tay tĩnh.', pre:'Pseudo Planche Push-up', tips:['Vai nhô qua cổ tay càng nhiều càng tốt trong giới hạn kiểm soát.','Giữ tay thẳng, không khoá cứng khớp khuỷu.','Tăng dần thời gian giữ trước khi tăng góc nghiêng.'] },
+      { name:'Ring Support Hold', level:2, desc:'Giữ thăng bằng trên vòng treo (rings) ở tư thế chống thẳng tay, rèn ổn định vai và cổ tay trên bề mặt không cố định.', pre:'Dips 10 reps', tips:['Ép vai xuống và ra sau, tránh nhún vai.','Xoay vòng ra ngoài nhẹ (turn-out) để bảo vệ khớp vai.','Siết toàn thân để hạn chế vòng đung đưa.'] },
+      { name:'One Arm Push-up', level:3, desc:'Chống đẩy chỉ bằng một tay, chân mở rộng để giữ thăng bằng, đòi hỏi sức mạnh và kiểm soát core cao.', pre:'Archer Push-up sâu', tips:['Mở rộng hai chân đáng kể để tạo điểm tựa vững.','Tay không tập đặt sau lưng hoặc chạm nhẹ vào hông.','Siết chặt toàn thân để chống xoay người khi hạ.'] },
+      { name:'Tuck Planche', level:3, desc:'Nâng người khỏi mặt đất ở tư thế co gối sát ngực, hông cao hơn vai, giữ thăng bằng hoàn toàn bằng tay.', pre:'Planche Lean vững 30s', tips:['Kéo vai về trước tối đa, xa hơn Planche Lean.','Đầu gối co sát ngực để trọng tâm gần tay hơn.','Nhìn về phía trước, không cúi đầu xuống.'] },
+      { name:'Ring Muscle-up', level:3, desc:'Muscle-up thực hiện trên vòng treo, đòi hỏi kiểm soát độ ổn định lớn hơn nhiều so với trên xà cố định.', pre:'Muscle-up trên xà', tips:['Bắt false grip (nắm cao lên sát cổ tay) trước khi kéo.','Kéo nhanh và mạnh để đưa ngực qua vòng.','Xoay cổ tay và chuyển tiếp ngay sang dips khi ngực vừa qua vòng.'] },
+      { name:'Advanced Tuck Planche', level:3, desc:'Duỗi hông ra xa hơn so với Tuck, đầu gối rời khỏi ngực nhưng vẫn co, tăng cánh tay đòn.', pre:'Tuck Planche 15-20s', tips:['Duỗi hông ra xa dần trong khi đầu gối vẫn co.','Vai tiếp tục đẩy về trước như ở Tuck Planche.','Tăng thời gian giữ trước khi thử mở sang Straddle.'] },
+      { name:'Straddle Planche', level:4, desc:'Duỗi thẳng chân và mở rộng sang hai bên để giảm mô-men lực so với Full Planche.', pre:'Advanced Tuck Planche', tips:['Mở chân rộng để giảm mô-men lực tác động lên vai.','Vai vẫn đẩy tối đa về phía trước.','Siết core chặt để tránh võng lưng dưới.'] },
+      { name:'Maltese', level:4, desc:'Chống thẳng tay ở vị trí ngang hông, thân nằm sát mặt đất — một trong những kỹ năng đẩy khó nhất, thường tập trên vòng treo.', pre:'Full Planche', tips:['Đòi hỏi vai cực khỏe và độ mở vai lớn, ưu tiên tập trên vòng.','Hạ dần thân từ vị trí Full Planche xuống ngang hông.','Tiến bộ từ từ, không vội ép biên độ khi vai chưa sẵn sàng.'] },
+      { name:'Full Planche', level:4, desc:'Thân và chân duỗi thẳng hoàn toàn song song mặt đất, chỉ chống bằng hai tay — biểu tượng sức mạnh đẩy của Calisthenics.', pre:'Straddle Planche 10s+', tips:['Khép chân dần lại khi Straddle đã giữ vững nhiều giây.','Toàn thân tạo một đường thẳng song song mặt sàn.','Vai là điểm chịu lực chính, tránh dồn áp lực vào cổ tay.'] },
+    ]
+  },
+  {
+    group: 'Kéo (Pull)',
+    items: [
+      { name:'Dead Hang', level:1, desc:'Treo thẳng tay trên xà, làm quen với việc chịu trọng lượng cơ thể và giải nén cột sống.', pre:'Không', tips:['Để vai thả lỏng tự nhiên, không cố rút vai lên.','Thở đều, tránh nín thở khi treo.','Tăng dần thời gian treo để quen dần với việc chịu trọng lượng.'] },
+      { name:'Scapula Pull', level:1, desc:'Treo xà, chỉ dùng bả vai kéo cơ thể lên nhẹ mà không gập khuỷu tay, kích hoạt lưng xô.', pre:'Dead Hang', tips:['Chỉ di chuyển bả vai (đưa xuống rồi thả lên), khuỷu tay giữ thẳng.','Cảm nhận rõ lưng xô kích hoạt ở mỗi lần kéo.','Thực hiện chậm và kiểm soát, không dùng đà.'] },
+      { name:'Australian Pull-up', level:1, desc:'Kéo ngang thân với xà thấp, chân chạm đất, làm quen động tác kéo trước khi tập Pull-up đứng.', pre:'Scapula Pull', tips:['Giữ thân thẳng từ đầu tới gót chân suốt bài tập.','Kéo ngực chạm xà, khuỷu tay ép sát thân.','Điều chỉnh độ khó bằng cách hạ thấp xà hoặc kê chân lên bục.'] },
+      { name:'Negative Pull-up', level:1, desc:'Bắt đầu ở đỉnh (cằm qua xà) rồi hạ người thật chậm, xây dựng sức mạnh kéo ly tâm cho người chưa kéo được Pull-up.', pre:'Australian Pull-up 8 reps', tips:['Nhảy hoặc bật lên vị trí cằm qua xà trước khi bắt đầu.','Hạ xuống chậm nhất có thể, lý tưởng 3-5 giây.','Kiểm soát toàn bộ biên độ, không rơi tự do giữa chừng.'] },
+      { name:'Pull-up / Chin-up', level:1, desc:'Kéo cơ thể từ treo thẳng tay lên tới khi cằm qua xà, bài tập nền tảng của mọi kỹ năng kéo.', pre:'Negative Pull-up có kiểm soát', tips:['Bắt đầu từ dead hang, không đung đưa lấy đà.','Kéo khuỷu tay xuống và ra sau, không chỉ gập tay.','Hạ xuống có kiểm soát về vị trí duỗi thẳng tay hoàn toàn.'] },
+      { name:'Wide Grip Pull-up', level:2, desc:'Pull-up với tay mở rộng hơn vai, nhấn mạnh vào bề rộng lưng xô.', pre:'Pull-up 10 reps', tips:['Biên độ ngắn hơn Pull-up thường, tập trung kéo bả vai lại gần nhau.','Tránh rướn cổ về trước khi kéo lên.','Giữ vai ổn định, không nhún vai.'] },
+      { name:'Archer Pull-up', level:2, desc:'Kéo lệch một bên, tay còn lại duỗi thẳng dọc theo xà, chuẩn bị cho kéo một tay.', pre:'Pull-up 10-12 reps', tips:['Kéo lệch hẳn về một bên, tay kia gần như duỗi thẳng chỉ để giữ thăng bằng.','Đổi bên đều để phát triển cân đối.','Giữ thân không xoay quá nhiều khi kéo.'] },
+      { name:'Typewriter Pull-up', level:2, desc:'Giữ ở đỉnh Pull-up rồi trượt ngang sang hai bên, tăng sức mạnh và kiểm soát vai.', pre:'Archer Pull-up', tips:['Giữ ở đỉnh Pull-up trước khi bắt đầu trượt ngang.','Không hạ thấp người xuống giữa chừng khi trượt.','Vai luôn ép xuống trong suốt chuyển động.'] },
+      { name:'German Hang', level:2, desc:'Treo xà với vai xoay ra sau, tay duỗi thẳng qua đầu, mở khớp vai — bước đệm trước Back Lever.', pre:'Dead Hang, vai linh hoạt', tips:['Mở vai từ từ, dừng lại nếu thấy đau nhói khác với căng cơ bình thường.','Có thể để chân chạm đất hỗ trợ khi mới tập.','Thở đều và thả lỏng vai càng nhiều càng tốt.'] },
+      { name:'Skin the Cat', level:2, desc:'Từ treo xà, cuộn người ra sau qua dưới xà rồi trở lại, tăng linh hoạt vai và kiểm soát thân trên khi lộn ngược.', pre:'German Hang', tips:['Thực hiện chậm và kiểm soát ở cả hai chiều lên và xuống.','Có thể dừng ở tư thế German Hang vài giây giữa chừng.','Không thả lỏng hoàn toàn để rơi qua động tác.'] },
+      { name:'Front Lever Tuck', level:2, desc:'Treo xà, co gối sát ngực và nâng hông để thân song song mặt đất, phiên bản dễ nhất của Front Lever.', pre:'Pull-up 8 reps', tips:['Kéo vai xuống và ra sau (depression + retraction).','Nâng hông cao ngang vai, không để hông tụt xuống.','Siết bụng gồng cứng toàn thân trong suốt hold.'] },
+      { name:'Back Lever', level:2, desc:'Treo úp người song song mặt đất, vai xoay ngoài, xây dựng sức mạnh vai sau và nhị đầu.', pre:'German Hang, Skin the Cat', tips:['Xoay vai ra ngoài hết mức, tránh để vai xoay trong gây đau.','Hạ xuống chậm từ Skin the Cat, không rơi thẳng vào tư thế.','Giữ thân thẳng, không để hông gập.'] },
+      { name:'Muscle-up', level:3, desc:'Kết hợp Pull-up bùng nổ và chuyển tiếp sang Dips trên cùng một xà, đòi hỏi tốc độ và kỹ thuật.', pre:'Pull-up 12+ reps, Dips 10+ reps', tips:['Kéo theo hướng chéo về phía xà, không kéo thẳng đứng.','Đưa ngực qua xà càng nhanh càng tốt ở đỉnh của lực kéo.','Xoay cổ tay và đẩy người lên ngay khi ngực gần chạm xà.'] },
+      { name:'Front Lever Advanced Tuck', level:3, desc:'Duỗi hông xa hơn Tuck, đầu gối vẫn co nhưng chân xa thân hơn, tăng đòn bẩy.', pre:'Front Lever Tuck 15-20s', tips:['Duỗi hông ra xa dần nhưng luôn giữ đường lưng thẳng.','Nếu hông tụt xuống nghĩa là core chưa đủ khoẻ, quay lại Tuck.','Vai vẫn kéo xuống và ra sau như ở Tuck.'] },
+      { name:'One Arm Chin-up (Assisted)', level:3, desc:'Chin-up một tay có hỗ trợ (dây kháng lực hoặc tay còn lại giữ cổ tay), bước chuyển tiếp sang kéo một tay hoàn toàn.', pre:'Chin-up 15+ reps', tips:['Dùng dây kháng lực buộc qua cổ tay tập hoặc tay kia chỉ hỗ trợ nhẹ.','Tập trung phần lớn lực kéo vào tay chính, giảm dần hỗ trợ.','Kiểm soát pha hạ xuống, không để rơi nhanh.'] },
+      { name:'Front Lever Straddle', level:4, desc:'Chân duỗi thẳng và mở rộng, thân giữ song song mặt đất hoàn toàn bằng sức kéo lưng xô và core.', pre:'Front Lever Advanced Tuck', tips:['Mở chân rộng để giảm đòn bẩy so với Full Front Lever.','Vai kéo xuống tối đa trong suốt hold.','Giữ hông không bị gập, thân thẳng từ vai tới chân.'] },
+      { name:'Full Front Lever', level:4, desc:'Toàn thân duỗi thẳng song song mặt đất, hai chân khép, chỉ treo bằng hai tay — một trong những kỹ năng kéo khó nhất.', pre:'Front Lever Straddle 10s+', tips:['Khép chân dần khi Straddle đã giữ vững nhiều giây.','Toàn thân tạo một đường thẳng song song mặt sàn.','Hít thở đều, tránh nín thở khi giữ hold.'] },
+      { name:'One Arm Pull-up', level:4, desc:'Kéo toàn thân lên chỉ bằng một tay từ treo thẳng — đỉnh cao sức mạnh kéo, cần nhiều năm rèn luyện.', pre:'One Arm Chin-up Assisted', tips:['Xây nền từ One Arm Chin-up hỗ trợ, giảm dần lực hỗ trợ theo thời gian.','Thân hơi xoay theo hướng tay kéo là hiện tượng bình thường.','Ưu tiên chin-up grip (lòng bàn tay hướng vào) trước khi thử pull-up grip.'] },
+    ]
+  },
+  {
+    group: 'Core & Bụng',
+    items: [
+      { name:'Plank', level:1, desc:'Giữ tư thế chống thẳng người trên cẳng tay, siết bụng và mông để giữ thân thẳng — nền tảng ổn định core.', pre:'Không', tips:['Thân từ vai tới gót thẳng hàng, không võng lưng hay đẩy hông lên cao.','Siết mông và bụng trong suốt thời gian giữ.','Nhìn xuống sàn để giữ cổ ở tư thế trung tính.'] },
+      { name:'Hollow Body Hold', level:1, desc:'Nằm ngửa, ép lưng dưới sát sàn, nâng vai và chân tạo hình lòng chảo — nền tảng của mọi kỹ năng Calisthenics.', pre:'Plank 45s', tips:['Ép lưng dưới sát sàn suốt bài tập, không để hở khoảng trống.','Vai và chân chỉ nâng nhẹ khỏi sàn, không cần quá cao.','Duỗi tay qua đầu để tăng độ khó khi đã quen.'] },
+      { name:'Hanging Knee Raise', level:1, desc:'Treo xà, co gối lên ngang hông có kiểm soát, làm quen chịu lực bụng khi treo.', pre:'Hollow Body Hold', tips:['Tránh đung đưa người (kipping) để lấy đà.','Nâng gối chủ động bằng lực bụng, không giật.','Hạ chân xuống có kiểm soát, không thả rơi.'] },
+      { name:'Hanging Leg Raise', level:2, desc:'Treo xà, nâng hai chân duỗi thẳng lên ngang hông hoặc cao hơn, tăng cường độ so với co gối.', pre:'Hanging Knee Raise 12 reps', tips:['Giữ chân duỗi thẳng trong suốt chuyển động.','Siết bụng dưới để nâng nhẹ hông khi chân lên cao.','Không dùng đà đung đưa thân trên.'] },
+      { name:'L-sit', level:2, desc:'Chống tay trên sàn hoặc xà, nâng hai chân duỗi thẳng song song mặt đất tạo hình chữ L.', pre:'Hollow Body Hold 30-45s', tips:['Đẩy vai xuống, giữ tay thẳng không khoá cứng khớp.','Ép hai chân sát nhau và duỗi thẳng.','Nếu còn khó, co một chân trong khi chân kia duỗi thẳng để giảm tải.'] },
+      { name:'Toes to Bar', level:2, desc:'Treo xà, nâng hai chân duỗi thẳng chạm xà, kết hợp sức mạnh bụng và độ linh hoạt gân kheo.', pre:'Hanging Leg Raise 10 reps', tips:['Kết hợp lực bụng với độ mở gân kheo để chân lên cao.','Kiểm soát pha hạ xuống, không dùng đà quá nhiều.','Siết vai chắc trên xà trong suốt động tác.'] },
+      { name:'V-sit', level:3, desc:'Nâng chân cao hơn L-sit, thân và chân tạo hình chữ V, đòi hỏi core và độ mở háng tốt.', pre:'L-sit 20s+', tips:['Độ mở háng tốt giúp nâng chân cao hơn dễ dàng.','Giữ lưng thẳng, không để tròn lưng khi nâng chân.','Tập chuyển dần từ L-sit lên V-sit theo từng độ cao nhỏ.'] },
+      { name:'Dragon Flag', level:3, desc:'Giữ vai trên ghế/sàn, toàn thân thẳng cứng nâng lên hạ xuống có kiểm soát — bài tập huyền thoại của Bruce Lee.', pre:'Hollow Body Hold, L-sit', tips:['Chỉ có vai chạm ghế/sàn, phần còn lại của thân cứng như một khối.','Hạ xuống thật chậm, không để lưng dưới cong lại.','Có thể co gối để giảm độ khó khi mới tập.'] },
+      { name:'Windshield Wiper', level:3, desc:'Treo xà ở tư thế Toes to Bar rồi xoay chân sang hai bên như cần gạt nước, đòi hỏi core xoay cực mạnh.', pre:'Toes to Bar', tips:['Giữ vai và thân trên ổn định, không đung đưa cả người.','Xoay chân sang hai bên bằng lực core, không dùng đà chân.','Kiểm soát tốc độ xoay, tránh giật mạnh gây chấn thương vai.'] },
+      { name:'Human Flag (Tuck → Full)', level:4, desc:'Bám cột thẳng đứng, nâng cơ thể song song mặt đất chỉ bằng lực kéo–đẩy của hai tay; tập từ tư thế co gối tới duỗi thẳng hoàn toàn.', pre:'Pull-up, Dips, core mạnh', tips:['Tay trên nắm chặt kéo cột về phía mình, tay dưới đẩy đỡ cơ thể.','Siết toàn thân như một khối cứng để giữ thăng bằng.','Tập từ tư thế tuck (co gối) trước khi thử duỗi thẳng chân.'] },
+    ]
+  },
+  {
+    group: 'Thăng bằng tay (Handbalancing)',
+    items: [
+      { name:'Crow Pose (Tư thế con quạ)', level:1, desc:'Chống tay, đặt gối lên khuỷu tay và nhấc chân khỏi sàn, bài tập nhập môn về thăng bằng trên tay.', pre:'Không', tips:['Đặt gối lên phần sau khuỷu tay (bắp tay), không lên khuỷu tay trực tiếp.','Nhìn về một điểm cố định phía trước, không nhìn xuống.','Dồn trọng lượng dần lên tay, đừng vội nhấc cả hai chân cùng lúc.'] },
+      { name:'Wall Handstand', level:1, desc:'Trồng chuối dựa tường (bụng hoặc lưng hướng tường) để làm quen cảm giác lộn ngược và chịu lực cổ tay.', pre:'Crow Pose', tips:['Các ngón tay bám chặt sàn để hỗ trợ cân bằng.','Đẩy vai để tạo một đường thẳng qua tay và thân.','Bắt đầu với bụng hướng tường (walk-up) nếu mới làm quen lộn ngược.'] },
+      { name:'Wall Walk', level:2, desc:'Từ plank, đi hai chân leo dần lên tường trong khi tay di chuyển lại gần, xây dựng sức mạnh và tự tin lộn ngược.', pre:'Wall Handstand 30s', tips:['Đi từng bước nhỏ, giữ core siết chặt suốt quá trình.','Tay di chuyển lại gần chân khi chân leo cao dần trên tường.','Dừng lại nếu cảm thấy mất kiểm soát, không cố ép lên cao.'] },
+      { name:'Freestanding Handstand', level:2, desc:'Trồng chuối tự do không dựa tường, cân bằng bằng các ngón tay và vai.', pre:'Wall Handstand 60s', tips:['Dùng các ngón tay để vi chỉnh thăng bằng, không phải cổ tay.','Tìm đường thẳng tai – vai – hông – gót chân.','Tập gần tường để có điểm bắt lỗi khi ngã.'] },
+      { name:'Handstand Push-up', level:3, desc:'Gập – duỗi khuỷu tay ở tư thế trồng chuối (có thể dựa tường), xây dựng sức mạnh vai kiểu đẩy dọc.', pre:'Freestanding Handstand, Pike Push-up', tips:['Hạ đầu xuống chạm nhẹ giữa hai tay có kiểm soát.','Giữ khuỷu tay hướng về phía trước, không xoè ngang.','Siết core để tránh võng lưng khi hạ xuống.'] },
+      { name:'Handstand Walk', level:3, desc:'Di chuyển bằng tay khi đang trồng chuối tự do, đòi hỏi thăng bằng động và kiểm soát vai liên tục.', pre:'Freestanding Handstand 45s+', tips:['Bước những bước nhỏ và nhanh thay vì bước dài.','Mắt nhìn vào điểm giữa hai tay, không nhìn quá xa.','Giữ vai ổn định, hông không đung đưa nhiều.'] },
+      { name:'90-Degree Push-up', level:3, desc:'Handstand Push-up với biên độ đầy đủ, khuỷu tay gập tới 90 độ, khó hơn nhiều so với bản dựa tường.', pre:'Handstand Push-up (tường)', tips:['Cần vai và tay sau rất khoẻ, tăng tải từ từ.','Hạ chậm và kiểm soát tới góc 90°, không dồn lực đột ngột.','Tránh ép biên độ sâu hơn khi chưa kiểm soát tốt phần trên.'] },
+      { name:'One Arm Handstand', level:4, desc:'Trồng chuối chỉ bằng một tay, đỉnh cao của thăng bằng và sức mạnh vai — cần nhiều năm luyện tập.', pre:'Freestanding Handstand vững, Handstand Push-up', tips:['Chân hơi lệch nhau để cân bằng mô-men lực.','Tay không tập chỉ chạm nhẹ hỗ trợ rồi nhấc dần lên.','Kiên nhẫn tăng thời gian giữ trên một tay theo từng giai đoạn nhỏ.'] },
+    ]
+  },
+  {
+    group: 'Chân & Bật nhảy',
+    items: [
+      { name:'Bodyweight Squat', level:1, desc:'Squat hai chân tiêu chuẩn, nền tảng kỹ thuật cho toàn bộ các bài tập chân nâng cao.', pre:'Không', tips:['Đầu gối hướng theo mũi chân khi hạ xuống.','Hạ tới khi đùi song song sàn hoặc thấp hơn nếu độ linh hoạt cho phép.','Giữ lưng thẳng tự nhiên, không tròn lưng dưới.'] },
+      { name:'Lunge', level:1, desc:'Bước chân về trước hoặc sau và hạ thấp trọng tâm, rèn thăng bằng và sức mạnh từng bên chân.', pre:'Bodyweight Squat', tips:['Bước đủ dài để đầu gối trước không vượt quá mũi chân.','Hạ thẳng xuống theo phương thẳng đứng, không đổ người về trước.','Giữ thân trên thẳng đứng suốt động tác.'] },
+      { name:'Bulgarian Split Squat', level:1, desc:'Squat một chân với chân sau kê cao, xây dựng sức mạnh và thăng bằng từng bên chân.', pre:'Lunge', tips:['Chân sau chỉ kê nhẹ lên bục, không dồn lực vào đó.','Trọng lượng dồn chủ yếu vào chân trước.','Nghiêng thân hơi về trước để tăng kích hoạt cơ mông.'] },
+      { name:'Jump Squat', level:1, desc:'Squat kết hợp bật nhảy để phát triển sức mạnh bùng nổ (explosive power) cho chân.', pre:'Bodyweight Squat', tips:['Tiếp đất êm bằng cả bàn chân, đầu gối hơi khuỵu để giảm chấn.','Giữ nhịp thở đều giữa các lần nhảy.','Squat xuống trước khi bật để tích lũy lực bùng nổ.'] },
+      { name:'Calf Raise', level:1, desc:'Nhón gót đứng trên bậc thềm, xây dựng sức mạnh bắp chân hỗ trợ bật nhảy và thăng bằng.', pre:'Không', tips:['Nhón cao hết cỡ rồi hạ xuống chậm để kéo giãn hoàn toàn.','Có thể tập từng chân để tăng độ khó.','Giữ thăng bằng bằng cách vịn nhẹ vào tường hoặc lan can nếu cần.'] },
+      { name:'Box Jump', level:2, desc:'Bật nhảy lên bục cao có kiểm soát tiếp đất, phát triển sức mạnh bùng nổ và phản xạ.', pre:'Jump Squat', tips:['Tiếp đất nhẹ nhàng bằng cả bàn chân trên bục, đầu gối hơi gập.','Bước xuống thay vì nhảy xuống để bảo vệ khớp gối.','Chọn độ cao bục phù hợp, không cố ép nhảy quá cao.'] },
+      { name:'Pistol Squat', level:2, desc:'Squat một chân, chân còn lại duỗi thẳng phía trước — bài kiểm tra sức mạnh và thăng bằng chân kinh điển.', pre:'Bulgarian Split Squat', tips:['Chân không trụ giữ thẳng phía trước suốt động tác.','Tay có thể đưa ra trước để hỗ trợ giữ thăng bằng.','Hạ chậm có kiểm soát, tránh sập xuống đột ngột.'] },
+      { name:'Nordic Curl', level:3, desc:'Quỳ gối cố định bàn chân, hạ thân người xuống có kiểm soát bằng gân kheo — bài tập gân kheo eccentric mạnh mẽ.', pre:'Squat 20 reps liên tục', tips:['Cố định chắc bàn chân/mắt cá trước khi bắt đầu.','Hạ người xuống càng chậm càng tốt, dùng lực gân kheo kiểm soát.','Dùng tay chống đỡ khi gần chạm sàn nếu chưa đủ sức kiểm soát toàn biên độ.'] },
+      { name:'Shrimp Squat', level:3, desc:'Squat một chân, chân kia gập ra sau nắm bằng tay, đòi hỏi thăng bằng, sức mạnh và độ mở khớp gối cao.', pre:'Pistol Squat vững', tips:['Nắm chân sau bằng tay cùng bên để giữ ổn định.','Giữ thăng bằng chủ yếu bằng lực core.','Hạ chậm, để đầu gối chân sau chạm nhẹ sàn.'] },
+      { name:'Dragon Squat', level:4, desc:'Biến thể Pistol Squat với chân không trụ bắt chéo ra sau, đòi hỏi độ linh hoạt hông và sức mạnh cực lớn.', pre:'Shrimp Squat', tips:['Cần độ linh hoạt hông rất tốt, khởi động kỹ trước khi tập.','Giữ thân thẳng đứng trong suốt động tác.','Ưu tiên kiểm soát chuyển động hơn là tốc độ.'] },
+    ]
+  },
+  {
+    group: 'Kỹ năng động (Dynamic & Flow)',
+    items: [
+      { name:'Kip-up', level:2, desc:'Từ tư thế nằm ngửa, bật hông và dùng đà tay để đứng dậy nhanh, rèn sức bật core và phối hợp toàn thân.', pre:'Hollow Body Hold', tips:['Dùng lực bật của hông kết hợp đà chống tay xuống sàn.','Luyện tập trên nệm hoặc thảm mềm trước khi thử trên sàn cứng.','Giữ core siết chặt trong suốt pha bật lên.'] },
+      { name:'Clapping Push-up', level:2, desc:'Chống đẩy bùng nổ đủ để tay rời sàn và vỗ tay giữa không trung, phát triển sức mạnh đẩy dạng plyometric.', pre:'Push-up 20 reps', tips:['Đẩy bùng nổ từ ngực, tạo đủ lực để tay rời sàn.','Thu tay về vị trí nhanh trước khi tiếp đất trở lại.','Tiếp đất bằng khuỷu tay hơi gập để giảm chấn.'] },
+      { name:'Burpee Pull-up', level:2, desc:'Kết hợp burpee với bật nhảy lên xà thực hiện Pull-up, bài tập sức bền và sức mạnh toàn thân cường độ cao.', pre:'Pull-up, Burpee cơ bản', tips:['Giữ nhịp độ ổn định thay vì chạy đua tốc độ ngay từ đầu.','Bật nhảy thẳng lên nắm xà chắc chắn trước khi kéo.','Hạ xuống có kiểm soát để chuẩn bị cho lần lặp tiếp theo.'] },
+      { name:'360 Pull-up', level:3, desc:'Pull-up kết hợp xoay tròn 360 độ quanh xà giữa động tác kéo, đòi hỏi sức mạnh, tốc độ và sự tự tin cao.', pre:'Muscle-up', tips:['Tạo đà xoay bằng thân trên trong pha kéo lên.','Nắm lại xà thật chắc chắn giữa vòng xoay.','Tập trên xà thấp có đệm lót bên dưới trước khi thử ở độ cao thật.'] },
+      { name:'Muscle-up to Handstand', level:4, desc:'Chuyển tiếp liên hoàn từ Muscle-up trên xà thẳng lên tư thế trồng chuối, kết hợp sức mạnh kéo, đẩy và thăng bằng.', pre:'Muscle-up, Freestanding Handstand', tips:['Chuyển tiếp ngay khi ngực vừa qua xà, không dừng lại giữa chừng.','Đẩy thẳng người lên và chuyển trọng tâm sang chống tay.','Cần thành thạo riêng lẻ cả Muscle-up và Handstand trước khi ghép nối.'] },
+    ]
+  }
+];
+
+let activeGroupFilter = 'all';
+
+function levelLabel(l){
+  return ['','CƠ BẢN','TRUNG CẤP','NÂNG CAO','MASTER'][l];
+}
+function levelClass(l){
+  return 'lvl-' + l;
+}
+
+function renderCatToolbar(){
+  const bar = document.getElementById('catToolbar');
+  const groups = ['all', ...SKILLS.map(g=>g.group)];
+  bar.innerHTML = groups.map(g=>{
+    const label = g === 'all' ? 'Tất cả' : g;
+    const active = activeGroupFilter === g ? 'active' : '';
+    return `<button class="chip ${active}" data-group="${escapeHtml(g)}">${escapeHtml(label)}</button>`;
+  }).join('');
+
+  bar.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      activeGroupFilter = chip.dataset.group;
+      renderCatToolbar();
+      renderSkills();
+    });
+  });
+}
+
+function renderSkills(){
+  const container = document.getElementById('skillsContainer');
+  const groupsToShow = activeGroupFilter === 'all'
+    ? SKILLS
+    : SKILLS.filter(g => g.group === activeGroupFilter);
+
+  container.innerHTML = groupsToShow.map(group => `
+    <div class="skill-group">
+      <div class="skill-group-title">${escapeHtml(group.group)}</div>
+      <div class="skill-grid">
+        ${group.items.map(item => `
+          <div class="skill-card" data-group="${escapeHtml(group.group)}" data-item="${escapeHtml(item.name)}">
+            <div class="skill-top">
+              <div class="skill-name">${escapeHtml(item.name)}</div>
+              <span class="lvl ${levelClass(item.level)}">${levelLabel(item.level)}</span>
+            </div>
+            <div class="skill-desc">${escapeHtml(item.desc)}</div>
+            <div class="skill-pre"><b>Điều kiện tiên quyết:</b> ${escapeHtml(item.pre)}</div>
+            <div class="skill-hint">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              Bấm để xem mẹo &amp; kỹ thuật
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.skill-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      openSkillModal(card.dataset.group, card.dataset.item);
+    });
+  });
+}
+
+/* =========================================================
+   SKILL DETAIL MODAL
+========================================================= */
+function findSkillItem(groupName, itemName){
+  const group = SKILLS.find(g => g.group === groupName);
+  if(!group) return null;
+  return group.items.find(i => i.name === itemName) || null;
+}
+
+function openSkillModal(groupName, itemName){
+  const item = findSkillItem(groupName, itemName);
+  if(!item) return;
+
+  const tipsHtml = (item.tips && item.tips.length)
+    ? `<ul class="modal-tips-list">
+        ${item.tips.map((tip, i) => `
+          <li><span class="tip-dot">${i+1}</span><span>${escapeHtml(tip)}</span></li>
+        `).join('')}
+      </ul>`
+    : `<div class="modal-no-tips">Chưa có mẹo/kỹ thuật cho bài này.</div>`;
+
+  const card = document.getElementById('skillModalCard');
+  card.innerHTML = `
+    <button class="modal-close" id="skillModalCloseBtn" aria-label="Đóng">✕</button>
+    <div class="modal-top">
+      <div class="modal-name">${escapeHtml(item.name)}</div>
+      <span class="lvl ${levelClass(item.level)}">${levelLabel(item.level)}</span>
+    </div>
+    <div class="modal-group">${escapeHtml(groupName)}</div>
+    <div class="modal-desc">${escapeHtml(item.desc)}</div>
+    <div class="modal-pre"><b>Điều kiện tiên quyết:</b> ${escapeHtml(item.pre)}</div>
+    <div class="modal-tips-title">Mẹo &amp; kỹ thuật</div>
+    ${tipsHtml}
+  `;
+
+  document.getElementById('skillModalOverlay').classList.add('open');
+  document.getElementById('skillModalCloseBtn').addEventListener('click', closeSkillModal);
+}
+
+function closeSkillModal(){
+  document.getElementById('skillModalOverlay').classList.remove('open');
+}
+
+document.getElementById('skillModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'skillModalOverlay') closeSkillModal();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    closeSkillModal();
+    closeTimerModal();
+    closeConfirmModal();
+    closeImportModal();
+  }
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+sortDays();
+renderDays();
+renderCatToolbar();
+renderSkills();
+updateHeaderVipBadge();
+</script>
+</body>
+</html>
